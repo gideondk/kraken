@@ -172,16 +172,27 @@ main:has(.k-landing) > div:has(h1#_top) { display: none; }
   color: #64748b;
 }
 .k-term-body {
-  margin: 0;
-  padding: 1rem 1.1rem 1.2rem;
-  min-height: 15.5rem;
+  position: relative;
   font-family: var(--sl-font-mono);
   font-size: 0.82rem;
   line-height: 1.75;
   color: #cbd5e1;
+}
+.k-term-ghost,
+.k-term-screen {
+  margin: 0;
+  padding: 1rem 1.1rem 1.2rem;
+  font: inherit;
+  line-height: inherit;
+  background: transparent;
+  border: none;
   white-space: pre-wrap;
   word-break: break-word;
+  overflow: hidden;
 }
+/* The ghost transcript reserves the finished height; typing overlays it. */
+.k-term-ghost { visibility: hidden; }
+.k-term-screen { position: absolute; inset: 0; }
 .k-term-body .tl { min-height: 1.75em; }
 .k-term-body .tl.cmd { color: #e2e8f0; font-weight: 500; }
 .k-term-body .tl.cmd::before { content: '❯ '; color: #34d399; font-weight: 600; }

@@ -2,7 +2,18 @@
 // The landing hero's fake terminal: types out a real Kraken session shape
 // (run → plan review → arms → judge → train → green trunk), loops with a
 // long pause, and falls back to a static transcript under
-// prefers-reduced-motion.
+// prefers-reduced-motion. A hidden ghost transcript reserves the finished
+// height up front, so typing never shifts the layout.
+const LINES = [
+  { cls: 'cmd', text: 'kraken run "add rate limiting to the public API"' },
+  { cls: 'dim', text: 'planned 2 contracts · plan-9f3a awaiting review' },
+  { cls: 'cmd', text: 'kraken decide 9f3a plan-9f3a approve "cap at 100 req/min"' },
+  { cls: 'cmd', text: 'kraken exec 9f3a' },
+  { cls: 'info', text: '→ wave: limiter-core, http-middleware — arms dispatched in worktrees' },
+  { cls: 'ok', text: '✓ judge limiter-core: PASS (0.91) — gates green, end state matches contract' },
+  { cls: 'info', text: '▸ train: 2 cars validated against predicted trunk · merged atomically' },
+  { cls: 'ok', text: '✓ run 9f3a complete — trunk green' },
+];
 ---
 
 <div class="k-term" role="img" aria-label="A Kraken terminal session: a run is planned, approved, executed by parallel arms, judged, and merged through the train onto a green trunk.">
@@ -10,23 +21,28 @@
     <span class="k-dot"></span><span class="k-dot"></span><span class="k-dot"></span>
     <span class="k-term-title">kraken — fleet session</span>
   </div>
-  <pre class="k-term-body" id="k-hero-screen" aria-hidden="true"></pre>
+  <div class="k-term-body" aria-hidden="true">
+    {/* Ghost transcript: invisible, but sizes the terminal to its final height. */}
+    <pre class="k-term-ghost">{LINES.map((l) => <div class={`tl ${l.cls}`}>{l.text}</div>)}</pre>
+    <pre class="k-term-screen" id="k-hero-screen"></pre>
+  </div>
 </div>
 
 <script>
-  type Line = { cls: string; text: string; typed?: boolean };
+  type Line = { cls: string; text: string };
 
   const LINES: Line[] = [
-    { cls: 'cmd', text: 'kraken run "add rate limiting to the public API"', typed: true },
+    { cls: 'cmd', text: 'kraken run "add rate limiting to the public API"' },
     { cls: 'dim', text: 'planned 2 contracts · plan-9f3a awaiting review' },
-    { cls: 'cmd', text: 'kraken decide 9f3a plan-9f3a approve "cap at 100 req/min"', typed: true },
-    { cls: 'cmd', text: 'kraken exec 9f3a', typed: true },
+    { cls: 'cmd', text: 'kraken decide 9f3a plan-9f3a approve "cap at 100 req/min"' },
+    { cls: 'cmd', text: 'kraken exec 9f3a' },
     { cls: 'info', text: '→ wave: limiter-core, http-middleware — arms dispatched in worktrees' },
     { cls: 'ok', text: '✓ judge limiter-core: PASS (0.91) — gates green, end state matches contract' },
     { cls: 'info', text: '▸ train: 2 cars validated against predicted trunk · merged atomically' },
     { cls: 'ok', text: '✓ run 9f3a complete — trunk green' },
   ];
 
+  const TYPED = new Set(['cmd']);
   const screen = document.getElementById('k-hero-screen');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -54,7 +70,7 @@
         const el = document.createElement('div');
         el.className = `tl ${line.cls}`;
         screen.appendChild(el);
-        if (line.typed) {
+        if (TYPED.has(line.cls)) {
           el.appendChild(cursor);
           await sleep(420);
           for (const ch of line.text) {
@@ -69,7 +85,7 @@
         }
       }
       // Hold the finished session on screen, then run it again.
-      await sleep(11000);
+      await sleep(14000);
       if (reduced.matches) return renderStatic();
     }
   }

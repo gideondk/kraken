@@ -1,12 +1,14 @@
 ---
 title: The Claude Code plugin
-description: Turn any Claude Code session into a helm — MCP tools for the fleet, plus skills for onboarding and delegation judgment.
+description: Turn any Claude Code session into a helm — fleet tools over the Model Context Protocol, plus skills for onboarding and delegation judgment.
 ---
 
 Kraken ships as a Claude Code plugin: the checkout itself is the plugin
 (`.claude-plugin/plugin.json` + `.mcp.json` + `skills/`). Load it and your
 session becomes a helm — it can plan runs, approve them, execute the fleet,
 and drain decisions, all against the same journal as the CLI and the bridge.
+The session talks to Kraken over the Model Context Protocol (MCP), the
+standard for connecting agents to tools.
 
 ## Install
 

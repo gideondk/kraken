@@ -1,6 +1,6 @@
 ---
 title: Campaigns
-description: One intent, a DAG of single-repo runs — upstream interface changes compose into downstream goals.
+description: One intent, a dependency-ordered chain of single-repo runs — upstream interface changes compose into downstream goals.
 ---
 
 import Fig from '../../../components/Fig.astro';
@@ -15,14 +15,15 @@ invariants that make runs safe.
 ```sh
 kraken campaign "Add delete-awareness to the sync protocol end to end" \
   --repos /work/api,/work/sdk,/work/app
-kraken campaign-adv <campaignId>     # advance the DAG
+kraken campaign-adv <campaignId>     # advance the chain
 ```
 
-## Planning: slices over a DAG
+## Planning: slices over a dependency graph
 
 A plan-mode arm **reads** the given repositories (changing nothing) and
 splits the intent into per-repo **slices** — at most one per repository,
-ordered by dependency, forming a DAG. Repos that need no work are omitted.
+ordered by dependency, forming a directed acyclic graph (DAG): dependencies
+first, no cycles. Repos that need no work are omitted.
 Each slice's goal is written self-contained, for that repo's own planner. A
 structurally invalid plan (unknown repo, duplicate slice, dependency cycle)
 throws and journals the campaign `aborted` — a bad plan leaves a corpse, not
@@ -90,8 +91,8 @@ can never plan.
 
 <Shot
   src={campaign}
-  alt="A campaign on the bridge: the intent at top, and a DAG of single-repo run cards with per-run status"
-  caption="A campaign on the bridge: the DAG of runs, each card a full single-repo run with its own plan review, fleet, and train."
+  alt="A campaign on the bridge: the intent at top, and a dependency graph of single-repo run cards with per-run status"
+  caption="A campaign on the bridge: the dependency graph of runs, each card a full single-repo run with its own plan review, fleet, and train."
 />
 
 ## Aborting
