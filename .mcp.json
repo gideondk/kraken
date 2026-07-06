@@ -1,0 +1,11 @@
+{
+  "kraken": {
+    "command": "node",
+    "args": [
+      "--experimental-strip-types",
+      "--disable-warning=ExperimentalWarning",
+      "${CLAUDE_PLUGIN_ROOT}/packages/cli/src/index.ts",
+      "mcp"
+    ]
+  }
+}

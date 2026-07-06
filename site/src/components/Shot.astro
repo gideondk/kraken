@@ -1,0 +1,32 @@
+---
+// A bridge screenshot with a caption, framed in subtle browser chrome.
+// variant="phone" renders a narrower, bar-less frame for mobile viewports.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  caption?: string;
+  variant?: 'browser' | 'phone';
+}
+const { src, alt, caption, variant = 'browser' } = Astro.props;
+---
+
+<figure class:list={['k-shot', { 'is-phone': variant === 'phone' }]}>
+  <div class="k-shot-frame">
+    {variant === 'browser' && (
+      <div class="k-shot-bar" aria-hidden="true">
+        <span class="k-dot"></span><span class="k-dot"></span><span class="k-dot"></span>
+        <span class="k-shot-url">kraken serve · bridge</span>
+      </div>
+    )}
+    <Image
+      src={src}
+      alt={alt}
+      widths={variant === 'phone' ? [390, 780] : [720, 1200, 1800]}
+      sizes={variant === 'phone' ? '(max-width: 40rem) 100vw, 20rem' : '(max-width: 72rem) 100vw, 66rem'}
+    />
+  </div>
+  {caption && <figcaption set:html={caption} />}
+</figure>

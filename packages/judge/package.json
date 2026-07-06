@@ -1,0 +1,11 @@
+{
+  "name": "@kraken/judge",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": {
+    "@kraken/arms": "workspace:*",
+    "@kraken/core": "workspace:*",
+    "@kraken/train": "workspace:*"
+  }
+}

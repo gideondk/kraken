@@ -1,0 +1,61 @@
+---
+title: The findings bus
+description: Workers publish distilled discoveries; Kraken relevance-routes them to the siblings that need them.
+---
+
+import Fig from '../../../components/Fig.astro';
+
+Parallel agents fail in a characteristic way: each one makes reasonable
+implicit decisions in the dark, and the decisions conflict. The findings bus
+is the counter-measure — a structured side channel where discoveries travel
+between arms *without* sharing context windows.
+
+## What travels
+
+When an arm's checkpoint passes, the interesting parts of its
+[report](../contracts/#the-other-half-the-worker-report) are published as
+**findings**, each typed one of four kinds:
+
+| Kind | Example |
+| --- | --- |
+| `decision` | "Standardized on the shared `retryFetch` helper for all outbound calls." |
+| `gotcha` | "The test harness resets the DB between files — fixtures can't span them." |
+| `interface-change` | "`RateLimiter.check()` now returns `Promise<Verdict>`, not `boolean`." |
+| `blocker` | "`gh pr comment` denied — no tool grant for posting review replies." |
+
+Findings are distilled — temp paths stripped, boilerplate removed, cut at
+sentence bounds. The bus carries meaning, not logs.
+
+## Relevance routing
+
+Findings aren't broadcast. Kraken routes each one to the sibling contracts
+whose **owned paths overlap** the finding's paths — the files the publisher
+touched plus its owned globs. A finding about `src/http/**` reaches the arm
+that owns the middleware, not the arm writing docs. Every route is journaled
+(`FindingRouted`, with a reason), so you can see exactly which context
+reached which worker.
+
+<Fig caption="publish on pass, route by owned-path overlap, inject on dispatch" text={`
+  arm A (owns src/limiter/**)
+    └─ report: interfaceChanges:
+         ["check() now returns Promise<Verdict>"]
+         │
+         │  FindingPublished {kind: interface-change,
+         ▼                    paths: [src/limiter/**, …]}
+       bus ── overlap? ──▶ arm B (owns src/http/**)   ✓ routed
+           ── overlap? ──▶ arm C (owns docs/**)       ✗ not routed
+         │
+         ▼  next dispatch of B
+  "## Findings from sibling arms
+   - [interface-change] check() now returns Promise<Verdict> …"
+`} />
+
+## Dependency waves make it useful
+
+Contracts dispatch in [dependency waves](../contracts/), and each wave's
+work **merges through the train before the next wave dispatches**. So a
+downstream arm gets both channels at full strength: its dependencies' real
+merged code in its worktree, and their findings in its prompt. Findings
+pending for an arm are injected as a rendered block at dispatch time —
+full-content, but only the 2–4 findings that actually route to it. Context
+rot is real; the bus is curated by construction.

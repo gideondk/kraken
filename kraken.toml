@@ -1,0 +1,8 @@
+trunk = "kraken-trunk"
+gates = [
+  "pnpm install --silent",
+  "pnpm vitest run",
+  "pnpm --filter @kraken/bridge exec tsc --noEmit",
+  "pnpm --filter @kraken/bridge build"
+]
+max_parallel = 3

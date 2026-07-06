@@ -1,0 +1,6 @@
+{
+  "name": "kraken",
+  "description": "Delegate outcomes to a coding-agent fleet: contract planning, parallel isolated arms, judged checkpoints, speculative merge train. Adds MCP tools (start_run, decide, execute_run, run_status, conflict_radar) and skills for onboarding and delegation judgment.",
+  "version": "0.1.0",
+  "author": { "name": "Gideon de Kok" }
+}

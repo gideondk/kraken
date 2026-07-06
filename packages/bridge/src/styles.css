@@ -1,0 +1,146 @@
+/* Abyssal Telemetry — bespoke layer for the pieces Tailwind/ui don't own:
+   the page backdrop, header chrome, pipeline canvas, activity log, console, diff. */
+
+/* body background */
+body {
+  background: var(--bg-abyss) !important;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background:
+      radial-gradient(120% 80% at 50% -10%, rgba(78, 205, 230, 0.06), transparent 60%),
+      radial-gradient(rgba(148, 197, 210, 0.045) 1px, transparent 1px) 0 0 / 24px 24px,
+      var(--bg-abyss) !important;
+  }
+}
+#root { height: 100dvh; }
+
+/* header / nav */
+header {
+  display: flex; align-items: center; gap: 14px;
+  padding: max(14px, env(safe-area-inset-top)) 0 12px;
+  border-bottom: 1px solid var(--edge-faint); margin-bottom: 20px;
+  position: sticky; top: 0; z-index: 5;
+  background: linear-gradient(var(--bg-abyss) 82%, transparent);
+}
+header .brand { font: 500 15px var(--mono); color: var(--text-bright); text-decoration: none; }
+header .brand small { color: var(--text-dim); font-weight: 400; margin-left: 10px; font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; }
+nav { display: flex; gap: 2px; margin-left: auto; }
+nav a {
+  padding: 6px 13px; border-radius: 6px; font: 500 11px var(--mono);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--text-muted); text-decoration: none; transition: color 150ms;
+}
+nav a.active { color: var(--text-bright); background: var(--bg-raised); box-shadow: inset 0 0 0 1px var(--edge-faint); }
+nav a:hover { color: var(--text-bright); }
+.live-dot {
+  width: 6px; height: 6px; border-radius: 99px; background: var(--pulse);
+  box-shadow: 0 0 0 1px rgba(60,232,176,0.25), 0 0 12px rgba(60,232,176,0.35);
+  animation: breathe 2.4s infinite;
+}
+
+/* pipeline */
+.pipeline { position: relative; overflow-x: auto; padding: 12px 2px 8px; }
+.pipeline-inner { position: relative; min-width: min-content; }
+.pipeline svg.edges { position: absolute; inset: 0; pointer-events: none; }
+.pipeline svg.edges path { stroke: var(--edge); stroke-width: 1.25; fill: none; }
+.pipeline svg.edges path.hot { stroke: var(--pulse); opacity: 0.7; stroke-dasharray: 5 6; animation: flow 1.4s linear infinite; }
+.waves { display: flex; gap: 52px; position: relative; }
+.wave { display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+.node {
+  width: 210px; background: var(--bg-raised); border: 1px solid var(--edge-faint); border-radius: 8px;
+  padding: 10px 12px; position: relative; cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(232,240,242,0.03);
+  transition: border-color 200ms, box-shadow 200ms;
+}
+.node:hover { border-color: var(--edge-strong); }
+.node.active {
+  border-color: rgba(60, 232, 176, 0.4);
+  box-shadow: 0 0 0 1px rgba(60, 232, 176, 0.25), 0 0 14px rgba(60, 232, 176, 0.14);
+}
+.node.done { border-color: rgba(60, 232, 176, 0.18); }
+.node.bad { border-color: rgba(242, 109, 109, 0.35); }
+.node b { font: 500 12.5px var(--mono); color: var(--text-bright); display: block; margin-bottom: 2px; }
+.node .sub { font: 400 10px var(--mono); color: var(--text-dim); }
+.node .now {
+  font: 400 10px var(--mono); color: var(--pulse); margin-top: 6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+}
+.node .gauge { height: 2px; border-radius: 2px; background: var(--edge-faint); margin-top: 8px; overflow: hidden; }
+.node .gauge i { display: block; height: 100%; border-radius: 2px; }
+.head-node {
+  width: 54px; height: 54px; border-radius: 99px; background: var(--bg-raised);
+  border: 1px solid var(--edge); display: flex; align-items: center; justify-content: center;
+  font-size: 22px; align-self: center;
+}
+
+/* console + activity log */
+.console {
+  font: 11.5px/1.6 var(--mono); background: var(--bg-abyss); border: 1px solid var(--edge-faint);
+  border-radius: 6px; padding: 10px 12px; overflow-x: auto; margin: 8px 0 0;
+  max-height: 260px; overflow-y: auto; white-space: pre-wrap; word-break: break-word;
+}
+.activity-log { font: 400 10.5px var(--mono); color: var(--text-muted); border-left: 1px solid var(--edge); padding-left: 12px; margin: 10px 0 2px; }
+.activity-log div { padding: 1.5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.activity-log div:last-child { color: var(--pulse); }
+
+/* diff lines */
+.diff { font: 11.5px/1.55 var(--mono); overflow-x: auto; }
+.diff .line { padding: 0 4px; white-space: pre; min-width: max-content; color: var(--text-muted); }
+.diff .add { background: rgba(46, 160, 107, 0.12); color: #9fd8bc; }
+.diff .del { background: rgba(209, 96, 96, 0.12); color: #e5a8a2; }
+.diff .hunk { color: var(--text-dim); background: var(--bg-deep); padding: 2px 4px; }
+
+@keyframes breathe { 50% { opacity: 0.45; } }
+@keyframes flow { to { stroke-dashoffset: -11; } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+@media (max-width: 640px) { .waves { gap: 38px; } .node { width: 180px; } }
+
+/* ---------- v2 app shell ---------- */
+.mobile-topbar { display: none; }
+.hamburger { border: none; background: none; color: var(--tx-hi); padding: 6px; border-radius: 6px; cursor: pointer; display: flex; }
+.hamburger:active { background: var(--bg-raised); }
+.nav-backdrop { position: fixed; inset: 0; background: rgba(5, 8, 10, 0.45); opacity: 0; pointer-events: none; transition: opacity 200ms; z-index: 30; }
+.nav-backdrop.show { opacity: 1; pointer-events: auto; }
+.app { display: flex; height: 100dvh; overflow: hidden; }
+.sidebar {
+  width: 248px; flex-shrink: 0; display: flex; flex-direction: column;
+  border-right: 1px solid var(--edge-faint); background: var(--bg-deep);
+  padding: max(14px, env(safe-area-inset-top)) 12px 12px;
+}
+.sidebar .brand { display: flex; align-items: center; gap: 10px; padding: 2px 4px; }
+.wordmark { font-size: 14px; font-weight: 650; letter-spacing: -0.01em; color: var(--tx-hi); }
+.sidebar-item {
+  display: flex; gap: 8px; padding: 7px 8px; border-radius: 7px; margin-bottom: 2px;
+  color: var(--tx-hi);
+}
+.sidebar-item:hover { background: var(--bg-raised); }
+.sidebar-item.active { background: var(--bg-raised); box-shadow: inset 0 0 0 1px var(--edge-faint); }
+.spine { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.spine-scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px 24px 8px; }
+.spine-scroll > * { max-width: none; }
+.composer-dock {
+  padding: 8px 20px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--edge-faint);
+  background: linear-gradient(transparent, var(--bg-abyss) 30%);
+}
+@media (max-width: 760px) {
+  .app { flex-direction: column; }
+  .mobile-topbar {
+    display: flex; align-items: center; gap: 10px;
+    padding: max(10px, env(safe-area-inset-top)) 12px 10px;
+    border-bottom: 1px solid var(--edge-faint); background: var(--bg-deep);
+  }
+  .sidebar {
+    position: fixed; top: 0; bottom: 0; left: 0; z-index: 40;
+    width: min(84vw, 320px); height: 100dvh;
+    transform: translateX(-105%); transition: transform 240ms cubic-bezier(0.2, 0, 0, 1);
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.25);
+    padding-top: max(14px, env(safe-area-inset-top));
+  }
+  .sidebar.open { transform: none; }
+  .spine-scroll { padding: 12px 14px 8px; }
+  .composer-dock { padding: 8px 12px calc(10px + env(safe-area-inset-bottom)); }
+}
+
+.head-node span { font: 700 15px var(--mono); color: var(--pulse); }

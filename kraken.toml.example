@@ -1,0 +1,57 @@
+# Kraken per-repo configuration — copy to <your-repo>/kraken.toml
+trunk = "main"
+
+# Tool patterns auto-approved for every arm in this repo (Claude Code --allowedTools
+# syntax). Default-deny stays: grant narrowly, prefer read-only.
+# allowed_tools = ["Bash(gh pr view:*)", "Bash(gh api:*)", "Bash(terraform fmt:*)"]
+
+# Every merge car must pass these before trunk advances (semantic-conflict gate).
+gates = ["dotnet build", "dotnet test"]
+
+# Where skill packs live, relative to the repo. Each subdirectory with a
+# SKILL.md is a skill (Claude Code convention).
+skill_roots = [".claude/skills", "skills"]
+
+max_parallel = 4
+
+# Three-tier ladder (deterministic → self-heal → judge): mechanical ejections
+# (gate failures, textual conflicts) self-heal — kraken auto-decides
+# fix-forward until the same failure repeats (no progress) or the per-contract
+# budget runs out. Judge failures (behavioral doubt) always reach a human.
+auto_heal = true
+max_heals = 2
+
+# Lock-screen push for decision gates: an ntfy.sh topic or any webhook.
+# notify_url = "https://ntfy.sh/my-fleet"
+
+# Which harness runs the fleet. "claude" and "codex" are built in (native
+# stream parsing, live activity, tier→model maps); [[arms]] wires any other
+# coding CLI as a plain subprocess.
+default_arm = "claude"
+
+# Codex arm (built in — set default_arm = "codex"). Tier map defaults to the
+# July 2026 lineup: fast=gpt-5.4-mini, standard=gpt-5.4, frontier=gpt-5.5.
+# An [[arms]] block named "codex" only overrides those tier models; the
+# invocation itself (codex exec --json --sandbox workspace-write) is owned by
+# the built-in arm. Note: Codex has no per-dispatch tool allow-list flag, so
+# allowed_tools does not reach codex arms (use ~/.codex/rules for policy).
+# [[arms]]
+# name = "codex"
+# command = ["codex", "exec"]           # informational; required by the parser
+# fast_args = ["--model", "gpt-5.4-mini"]
+# standard_args = ["--model", "gpt-5.4"]
+# frontier_args = ["--model", "gpt-5.5"]
+
+# Task → skill routing. Explicit contract requests always win; rules fill
+# remaining slots (max 4 skills per worker — context rot is real).
+[[rules]]
+skill = "foundation-build"
+always = true
+
+[[rules]]
+skill = "event-sourcing-conventions"
+terms = ["aggregate", "event", "projection", "command"]
+
+[[rules]]
+skill = "foundation-servicebase"
+paths = ["services/**", "baselines/**"]

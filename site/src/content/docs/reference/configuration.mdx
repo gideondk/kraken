@@ -1,0 +1,112 @@
+---
+title: Configuration
+description: The full kraken.toml reference — trunk, gates, tool grants, auto-heal, skills routing, arms, and push.
+---
+
+One file per repo: `kraken.toml` in the repository root. Everything below is
+optional except `trunk` and, in practice, `gates`.
+
+```toml
+# Kraken per-repo configuration
+trunk = "main"
+
+# Tool patterns auto-approved for every arm in this repo (Claude Code
+# --allowedTools syntax). Default-deny stays: grant narrowly, prefer read-only.
+allowed_tools = ["Bash(gh pr view:*)", "Bash(gh api:*)", "Bash(terraform fmt:*)"]
+
+# Every merge car must pass these before trunk advances (semantic-conflict gate).
+gates = ["dotnet build", "dotnet test"]
+
+# Where skill packs live, relative to the repo. Each subdirectory with a
+# SKILL.md is a skill (Claude Code convention).
+skill_roots = [".claude/skills", "skills"]
+
+max_parallel = 4
+
+# Three-tier ladder (deterministic → self-heal → judge): mechanical ejections
+# self-heal until the same failure repeats or the per-contract budget runs out.
+auto_heal = true
+max_heals = 2
+
+# Lock-screen push for decision gates: an ntfy.sh topic or any webhook.
+notify_url = "https://ntfy.sh/my-fleet"
+
+# Which harness runs the fleet: "claude" and "codex" are built in; [[arms]]
+# wires any other coding CLI as a plain subprocess.
+default_arm = "claude"
+```
+
+## Top-level keys
+
+| Key | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `trunk` | string | — | The integration branch the [merge train](../../concepts/merge-train/) advances. Often a dedicated `kraken-trunk` cut from the default branch. |
+| `gates` | string[] | `[]` | Commands every merge-train car (and the trunk probe) must pass. [Fast, honest tripwires](../../start/onboard/#the-gates-philosophy-fast-honest-tripwires) — budget 2–3 minutes total. Non-interactive, deterministic. |
+| `allowed_tools` | string[] | `[]` | Tool patterns auto-approved for every arm (and [inherited by the judge](../../concepts/judge/#the-judge-has-hands)). Claude Code `--allowedTools` syntax. Default-deny for everything else. |
+| `skill_roots` | string[] | `[".claude/skills", "skills"]` | Directories scanned for skill packs (subdirectories containing a `SKILL.md`). |
+| `max_parallel` | int | `4` | Concurrent arms per wave. |
+| `auto_heal` | bool | `true` | Tier two of the [heal ladder](../../concepts/auto-heal/): mechanical ejections self-heal as fix-forward. |
+| `max_heals` | int | `2` | Heal budget per contract. Journal-derived, so crash-safe. |
+| `notify_url` | string | — | POSTed on every `DecisionRequested` — an [ntfy.sh](https://ntfy.sh) topic URL or any webhook. |
+| `default_arm` | string | `"claude"` | Which harness runs the fleet: `claude`, `codex`, or the name of an `[[arms]]` block. |
+
+## `[[rules]]` — skill routing
+
+Deterministic task→skill routing. Explicit skill requests in a contract
+always win; rules fill the remaining slots, capped at **4 skills per
+worker** — context rot is measured, and firehosing all skills degrades
+recall. Matched skills are injected **full-content** into the arm's prompt.
+
+```toml
+[[rules]]
+skill = "foundation-build"
+always = true                      # every contract gets it
+
+[[rules]]
+skill = "event-sourcing-conventions"
+terms = ["aggregate", "event", "projection", "command"]   # match on objective terms
+
+[[rules]]
+skill = "foundation-servicebase"
+paths = ["services/**", "baselines/**"]                   # match on owned paths
+```
+
+| Field | Meaning |
+| --- | --- |
+| `skill` | The skill's directory name under a `skill_roots` entry. |
+| `always` | Route to every contract. |
+| `terms` | Route when the contract's objective mentions any of these terms. |
+| `paths` | Route when the contract's owned paths overlap these globs. |
+
+## `[[arms]]` — harnesses
+
+`claude` and `codex` are built in, with native stream parsing, live
+activity, and tier→model maps. An `[[arms]]` block either configures the
+built-in `codex` arm's tier models, or wires **any other coding CLI** as a
+plain subprocess.
+
+```toml
+# Codex (built in — set default_arm = "codex"). An [[arms]] block named
+# "codex" only overrides the tier models; the invocation itself
+# (codex exec --json --sandbox workspace-write) is owned by the built-in arm.
+[[arms]]
+name = "codex"
+command = ["codex", "exec"]           # informational; required by the parser
+fast_args = ["--model", "gpt-5.4-mini"]
+standard_args = ["--model", "gpt-5.4"]
+frontier_args = ["--model", "gpt-5.5"]
+```
+
+Codex caveat: it has no per-dispatch tool allow-list flag, so
+`allowed_tools` does not reach codex arms — use `~/.codex/rules` for policy
+there.
+
+For any other CLI, the same shape applies: `name`, `command`, and per-tier
+args, run as a subprocess in the contract's worktree.
+
+## A note on honesty
+
+`kraken.toml` is the only deliverable of onboarding — but a *wrong* config
+poisons every run. If no single command covers the repo, pick the cheapest
+existing repo-wide checks and note the coverage gap in a comment. If there's
+no detectable build system, `gates = []` with a warning beats a guess.

@@ -1,0 +1,14 @@
+---
+// A terminal-feel ASCII figure with an optional caption. Text goes in as a
+// prop (template literal in MDX) so whitespace survives MDX parsing intact.
+interface Props {
+  text: string;
+  caption?: string;
+}
+const { text, caption } = Astro.props;
+---
+
+<figure class="k-fig">
+  <pre>{text.replace(/^\n/, '').replace(/\n\s*$/, '')}</pre>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>

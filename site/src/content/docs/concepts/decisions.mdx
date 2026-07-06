@@ -1,0 +1,88 @@
+---
+title: Decisions
+description: A drainable queue of the questions only you can answer — and every answer is machine action, not a comment.
+---
+
+import Fig from '../../../components/Fig.astro';
+import Shot from '../../../components/Shot.astro';
+import runDecision from '../../../assets/bridge/run-decision.png';
+
+Kraken keeps the human in the loop with a **queue, not a chat**. The fleet
+runs until it hits something only you can settle; that becomes a
+`DecisionRequested` in the journal — a question, a set of options, and the
+context to answer it. You drain the queue from whichever surface is closest:
+
+```sh
+kraken decisions                       # CLI
+kraken decide <run> <decision> <choice> ["annotation"]
+```
+
+…or the bridge, or the `list_decisions` / `decide` tools of Kraken's
+[Model Context Protocol (MCP) server](../../guides/claude-code-plugin/)
+inside a Claude Code session. One journal — a decision made anywhere is
+resolved everywhere, and `notify_url` pushes each new question to your lock
+screen.
+
+## What reaches you (and what doesn't)
+
+By design, most failures **don't**: gates settle facts, and
+[auto-heal](../auto-heal/) absorbs mechanical ejections. The queue is
+reserved for judgment:
+
+| Decision | Options |
+| --- | --- |
+| Plan approval | `approve` · `reject` |
+| Arm failed outright | `retry` · `park` · `escalate` |
+| Arm succeeded but changed nothing | `retry` · `park` |
+| Train ejection (heal stalled or off) | `fix-forward` · `retry-rebased` · `park` |
+| Judge fail at every tier | `retry` · `retry-with-tools` · `park` |
+| Permission-blocked | `retry-with-tools` · `retry` · `park` |
+| Trunk red under its own gates | `acknowledge` (auto-resolves when green) |
+
+<Shot
+  src={runDecision}
+  alt="A retry-with-tools decision on the bridge: the judge's rationale as context, and the suggested tool grants rendered as chips"
+  caption="A <code>retry-with-tools</code> decision on the bridge: the judge's rationale as context, suggested grants as chips — approve and the arm re-dispatches with exactly those tools."
+/>
+
+## Deciding is acting
+
+A decision is not a comment on the situation — it *is* the next machine
+action. Choosing `fix-forward` re-dispatches a repair arm on the ejected
+branch with the failure text as feedback. Choosing `retry-with-tools`
+re-dispatches with the scoped grants attached. Choosing `park` settles the
+contract so the run can complete. Approving a plan arms the whole fleet.
+There is no separate "now apply my decision" step; draining the queue and
+reconciling (`kraken exec`) is the whole interaction.
+
+## Retry-with-tools: scoped grants
+
+When a failure smells like a permission wall, Kraken parses the failure text
+for the concrete commands that were denied and suggests **narrow** grants —
+`Bash(gh pr comment:*)`, never `Bash(gh:*)`, capped in number, derived only
+from evidence. The grant applies to that contract's retry (and its judge,
+which [inherits the same tools](../judge/#the-judge-has-hands)) — it does
+not silently widen the repo's standing `allowed_tools`.
+
+## Steering notes
+
+Every `decide` takes an optional annotation, and on any retry-family choice
+(`retry`, `retry-rebased`, `retry-with-tools`, `escalate`, `fix-forward`)
+the **most recent human annotation travels to the worker** as a reviewer
+instruction:
+
+<Fig caption="annotations are steering, not paperwork" text={`
+ ❯ kraken decide 9f3a eject-http-middleware fix-forward \\
+     "do NOT repost the review comments — they landed the first time"
+
+ next dispatch of http-middleware:
+   # Repair contract — fix forward, do not start over
+   The merge gates failed with: …
+   Reviewer instruction: do NOT repost the review comments —
+                         they landed the first time
+`} />
+
+Machine auto-resolutions never count as steering — an auto-heal can't shadow
+an earlier human note that still applies. And stale questions
+[answer themselves](../journal/#decisions-auto-invalidate): the queue only
+ever contains questions that are still true.

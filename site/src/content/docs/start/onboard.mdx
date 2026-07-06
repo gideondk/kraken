@@ -1,0 +1,92 @@
+---
+title: Onboard a repository
+description: Write an honest kraken.toml — gates as fast tripwires, a trunk for the train, and narrow tool grants.
+---
+
+import Fig from '../../../components/Fig.astro';
+
+Onboarding a repo onto Kraken means one thing: writing an honest
+`kraken.toml`. No CI files, no wrapper scripts — one config file in the repo
+root.
+
+## The minimum
+
+```toml
+# kraken.toml
+trunk = "main"
+gates = ["pnpm test"]
+max_parallel = 4
+```
+
+- **`trunk`** — the integration branch the merge train advances. Many teams
+  point the train at a dedicated `kraken-trunk` branch (cut from the default
+  branch) so fleet work integrates there before a human fast-forwards main.
+- **`gates`** — commands every merge-train car must pass before trunk
+  advances. This is the semantic-conflict tripwire.
+- **`max_parallel`** — how many arms run at once.
+
+The full reference — including `allowed_tools`, `auto_heal`, `[[rules]]`, and
+`[[arms]]` — lives in [Configuration](../../reference/configuration/).
+
+## The gates philosophy: fast, honest tripwires
+
+Gates run on **every** merge-train car, every retry, and the trunk probe
+before each execution. Budget the whole gate list at **2–3 minutes**:
+
+<div class="k-prompt-list">
+- Derive gates from the project's own scripts (`pnpm test`, `dotnet build --nologo -v q`) — never invent them.
+- In monorepos, prefer fast static checks (fmt, lint, typecheck) over exhaustive builds. An 11-target validation sweep is a CI job, not a merge gate.
+- Gates must be non-interactive and deterministic. A wrong gate poisons every run.
+- Gates don't carry correctness alone — the [judge](../../concepts/judge/) and the exec-time trunk probe do the heavy lifting. Gates only need to catch a broken merge fast.
+</div>
+
+<Fig caption="division of labor — gates are the tripwire, not the verdict" text={`
+  gates         fast, deterministic      "does it still build & test?"
+  judge         one rubric call to       "is this the contract's
+                a model                   end state?"
+  trunk probe   gates on trunk itself    "is the baseline even green?"
+`} />
+
+Gates are arbitrary commands, so a reviewer can hold the trunk too: any
+adversarial reviewer that speaks exit codes can be a gate — exit 0 clean,
+exit 1 findings. The findings become the eject reason and feed the
+fix-forward repair contract:
+
+```toml
+gates = ["your-reviewer --base kraken-trunk --head HEAD"]
+```
+
+## Let an agent onboard it: `kraken-init`
+
+Kraken ships a [Claude Code plugin](../../guides/claude-code-plugin/) with a
+`kraken-init` skill that does the honest version of this for you. It:
+
+1. Detects the stack (`package.json` + lockfile, `*.sln`/`*.csproj`,
+   `Cargo.toml`, `pyproject.toml`, `go.mod`).
+2. Derives gate commands from the project's own scripts and **smoke-tests
+   each one once** (~2 minutes total) — proof the command is well-formed, not
+   an audit of the whole repo. The reconcile loop re-probes trunk before every
+   execution anyway.
+3. Writes `kraken.toml` with the trunk branch, gates, `max_parallel = 3`, and
+   — where tasks plausibly need commands beyond file edits — **narrow**
+   `allowed_tools` grants (specific subcommands, read-only preferred).
+4. Registers the project on the bridge via the `register_project` tool of
+   Kraken's Model Context Protocol (MCP) server (or `kraken onboard`), so it
+   appears in the sidebar before its first run.
+
+Its rules are worth stealing even when onboarding by hand: never overwrite an
+existing `kraken.toml` without showing a diff, and if no build system is
+detectable, write `gates = []` with a warning comment rather than guessing.
+
+## Tool grants are default-deny
+
+Arms run non-interactive. Anything not granted in `allowed_tools` is silently
+denied — workers report it as a blocker in their structured report rather
+than failing loudly, and the [decision queue](../../concepts/decisions/) can
+grant a scoped retry. Grant narrowly:
+
+```toml
+allowed_tools = ["Bash(gh pr view:*)", "Bash(gh api:*)", "Bash(terraform fmt:*)"]
+```
+
+Next: [your first run](../first-run/).

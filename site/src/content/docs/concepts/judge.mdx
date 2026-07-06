@@ -1,0 +1,114 @@
+---
+title: The judge
+description: Evidence beats claims — execution gates first, one rubric call on the end state, and the tools to verify side effects itself.
+---
+
+import Fig from '../../../components/Fig.astro';
+import Shot from '../../../components/Shot.astro';
+import runSuccess from '../../../assets/bridge/run-success.png';
+
+Agents are confident. That's the problem. Every harness will happily report
+"my work is complete" over a branch that doesn't compile. The judge is
+Kraken's answer: **no claim counts unless it's evidenced** — and the judge
+has hands, so it can gather evidence itself.
+
+## The shape of a verdict
+
+Every contract ends in a checkpoint, and every checkpoint is judged the same
+way — the shape that measured most consistent:
+
+<Fig caption="gates first, then one rubric call — end state, not process" text={`
+ checkpoint
+    │
+    ├─ 1 · execution gates     run in the worker's worktree — pass/fail facts
+    │      "pnpm test"  ✓
+    │      "pnpm build" ✓
+    │
+    ├─ 2 · one rubric call to a model
+    │      reads: contract + gate report + worker report + diff-vs-trunk
+    │      → {score: 0.91, pass: true, rationale: "…", mustFix: []}
+    │
+    └─ hard rules (not up for debate)
+       any failed gate           → pass = false, whatever the model said
+       writes outside ownsPaths  → pass = false
+       score < 0.7               → pass = false
+       unparseable verdict       → pass = false (fail closed;
+                                   failed gates become mustFix)
+`} />
+
+The judge scores the **final state against the contract** — objective,
+`expectedState`, output format, boundaries — never process conformance. It
+doesn't care how the worker got there; it cares whether the repo is now in
+the state the contract promised. Gate results are handed to it as evidence
+that explicitly **outranks its own impression**.
+
+The verdict is small and actionable: a score, a pass, a 2–4 sentence
+rationale, and `mustFix` — concrete fixes, one per item, that feed
+escalation retries and fix-forward arms verbatim.
+
+## The judge has hands
+
+The flagship property: **judges inherit the worker's tool grants.** If the
+contract involved external side effects — a PR comment posted, an API state
+changed — and the worker had `Bash(gh api:*)`, the judge gets the same grant
+and is instructed to *verify the side effect itself* before ruling it
+unevidenced:
+
+> If the contract involves external side effects (PR comments, API state) and
+> you have the tools to check them (e.g. `gh`), VERIFY them yourself before
+> ruling them unevidenced.
+
+This closes the gap that pure-diff judges can't see: work whose "done" lives
+outside the repository. A worker claiming "I replied to the review comments"
+either produced comments `gh` can fetch, or it didn't pass.
+
+## Cheap by default — the rubric does the work
+
+The judge call itself runs on the **fast** tier by default. The rigor comes
+from the structure — gates as ranked evidence, hard fail rules, a bounded
+rubric — not from model size. What escalates is the *worker*, not the judge.
+
+## Fail → escalate the ladder, with feedback
+
+A failed verdict escalates the worker's model tier, fast → standard →
+frontier, re-dispatching with the judge's exact findings:
+
+<Fig caption="tier escalation — the judge's mustFix list is the next attempt's briefing" text={`
+ attempt 1  [fast]
+   judge: FAIL (0.55) — "429 path untested; limiter bypassed on OPTIONS"
+      │
+      ▼  TierEscalated {from: fast, to: standard, reason: …}
+ attempt 2  [standard]
+   feedback: "# Judge feedback on your previous attempt
+              (fix these, keep what was right)
+              - add a test for the OPTIONS bypass
+              - make gate 'pnpm test' pass"
+      │
+      ▼  judge: PASS (0.88)
+ completed → merge train
+`} />
+
+When frontier fails too, the ladder is exhausted and a human gets a
+[decision](../decisions/): retry, retry with tool grants, or park.
+
+Verdicts aren't buried in logs — every score, rationale, and report renders
+on the bridge when the run finishes:
+
+<Shot
+  src={runSuccess}
+  alt="A finished run on the bridge: green completion state, per-task judge scores with rationales, and the workers' structured reports"
+  caption="A finished run: per-task judge scores with their rationales, and each arm's structured report — the receipts, not the vibes."
+/>
+
+## The permission-skip
+
+One failure class never escalates: **missing permissions**. If the verdict's
+rationale and the worker's blockers read like a permission wall ("not
+granted", "denied", "non-interactive"), Kraken skips the ladder — a smarter
+model cannot fix access — and asks for the real fix instead: a
+`retry-with-tools` decision carrying suggested **narrow** grants parsed from
+the failure text (`gh pr comment` → `Bash(gh pr comment:*)`). One click
+grants the scoped tools and re-dispatches, at the same tier.
+
+Judge failures never [auto-heal](../auto-heal/): behavioral doubt always
+reaches a person. Machines settle mechanical facts; humans settle meaning.

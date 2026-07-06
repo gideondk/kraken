@@ -1,0 +1,71 @@
+---
+title: Philosophy
+description: Contracts not vibes, verification over trust, a journal that never lies — and an honest list of what Kraken is not.
+---
+
+Kraken's design decisions are grounded in adversarially verified research —
+Anthropic's multi-agent system write-ups, Cognition's context principles,
+Uber's SubmitQueue, the MAST failure taxonomy, AgenticFlict conflict data —
+but they compress into four sentences.
+
+## Contracts, not vibes
+
+Work enters the fleet as a [typed contract](../../concepts/contracts/):
+one objective, explicit owned paths, a verifiable expected state. Not
+because ceremony is a virtue, but because every hard guarantee downstream —
+boundary enforcement, judge rubrics, conflict radar, findings routing —
+hangs off those fields. A fleet coordinated by prompt prose has nothing to
+verify against; a fleet coordinated by contracts does. The same discipline
+binds the human: your goal statement is the planner's entire world, so
+intent, constraints, and done-criteria go in writing.
+
+## Verification over trust
+
+Agents report success; Kraken checks. Gates run as processes, not opinions.
+The [judge](../../concepts/judge/) scores end states against contracts,
+treats gate evidence as outranking its own impression — and holds the same
+tool grants as the worker, so "I posted the PR comment" is checked against
+`gh`, not against confidence. Claims that can't be evidenced don't pass, and
+a failure to parse a verdict fails closed. The trunk itself isn't trusted:
+it's probed against the gates before any fleet work is allowed to merge.
+
+## The journal never lies
+
+Every fact is an [append-only event](../../concepts/journal/). Nothing
+mutates, so nothing can be quietly rewritten: who decided what — a human, a
+connected agent session, or Kraken itself — is permanent record, auto-heals journal the
+question they answered themselves, and every commit on trunk traces back
+through verdict, gates, contract, and approved plan to the goal that started
+it. Resume, audit, and the entire bridge UI are projections of the same
+sequence; state that can't drift from history, because it *is* history.
+
+## Everything that didn't need you happens without you
+
+Mechanical failures [heal themselves](../../concepts/auto-heal/) on a
+budget, with progress detection. Stale decisions
+[resolve themselves](../../concepts/journal/#decisions-auto-invalidate) when
+reality moves on. Green waves merge without asking. What reaches your
+[queue](../../concepts/decisions/) — and your lock screen — is the residue
+that genuinely needs judgment: plans, behavioral doubt, permission grants,
+stalls. Approval fatigue is a design failure, not a user failure; a system
+that asks about everything trains you to approve anything.
+
+## What Kraken is not
+
+Honesty cuts both ways. Kraken deliberately does **not** build:
+
+<div class="k-prompt-list">
+- **An IDE agent.** Kraken doesn't pair with you in an editor and has no conversational coding loop. It's the layer *behind* your agents — use Claude Code or Codex for the conversation, Kraken for landing the results.
+- **An agent harness.** No model calls, no context management, no tool-use implementation. [Arms](../../concepts/arms/) are the harnesses you already run.
+- **A CI system.** Gates are 2–3-minute tripwires on the merge path, not your build matrix. Keep CI; Kraken's train decides what reaches the branch CI watches.
+- **Model routing, review UIs, or sandboxing.** Use LiteLLM, use Crit/Plannotator, inherit the harness's sandbox. Kraken composes with these; it doesn't clone them.
+</div>
+
+And one caveat worth stating plainly: **the judge is a strong filter, not an
+oracle.** It's one rubric call over gates, diff, and report — cheap by
+design, hard-ruled where it can be, and tool-equipped to verify side effects.
+It will catch confident garbage far more often than no judge; it will not
+catch everything a senior reviewer would. That's why behavioral doubt always
+escalates to a human, why gates stay honest and fast, and why an adversarial
+reviewer can be [made a gate](../../start/onboard/#the-gates-philosophy-fast-honest-tripwires)
+when the stakes warrant it.

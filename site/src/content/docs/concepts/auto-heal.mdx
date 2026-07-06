@@ -1,0 +1,70 @@
+---
+title: Auto-heal
+description: The three-tier ladder — deterministic gates, self-healing mechanical failures, and a judge for behavioral doubt.
+---
+
+import Fig from '../../../components/Fig.astro';
+
+Most failures in a fleet are boring: a gate broke, a textual conflict
+appeared, a rebase is needed. Waking a human for those trains inattention —
+and inattention is how the *interesting* failures slip through. Kraken sorts
+every failure onto a three-tier ladder, and only the top tier reaches you.
+
+<Fig caption="the three-tier ladder — who handles what" text={`
+ tier 1   gates           deterministic
+          │               build/test commands, trunk probe, train validation
+          │               pass/fail is a fact — nobody deliberates
+          ▼ fail (mechanical: gate failure, textual conflict)
+ tier 2   self-heal       kraken decides
+          │               auto fix-forward on the same branch, budgeted,
+          │               with fingerprint progress detection
+          ▼ stalled, budget exhausted, or behavioral doubt
+ tier 3   judge + human   humans decide
+                          judge failures ALWAYS reach a person —
+                          behavioral doubt is not healable
+`} />
+
+## Tier 2: mechanical ejections heal themselves
+
+With `auto_heal = true` (the default posture), a car ejected from the train
+for a mechanical reason doesn't wait for you. Kraken answers its own
+decision — journaled as `decidedBy: "kraken"` — choosing `fix-forward`: a
+repair arm re-enters the same branch with the distilled gate failure as
+feedback, fixes exactly those failures, and re-queues.
+
+Two brakes keep this from becoming a doom loop:
+
+<div class="k-prompt-list">
+- **A budget.** `max_heals` (default 2) caps heals per contract. The count is derived from the journal — prior kraken-decided heal events — so it survives crashes and re-reconciles with no extra state.
+- **Progress detection.** Every eject reason is reduced to a **fingerprint**: lowercased, directories stripped to basenames, all digits normalized to `#`. The *same* error at a shifted line number still matches; a genuinely different error doesn't. Same fingerprint twice in a row means the heal made no progress — the ladder stops and a human gets the stall, told exactly how many attempts were made.
+</div>
+
+<Fig caption="fingerprints — 'same failure twice' means stalled, shifted line numbers don't fool it" text={`
+ eject #1: src/http/router.test.ts:142  FAIL  expected 429, got 200
+ eject #2: src/http/router.test.ts:198  FAIL  expected 429, got 200
+
+ fingerprint(#1) = "router.test.ts:# fail expected #, got #"
+ fingerprint(#2) = "router.test.ts:# fail expected #, got #"
+                    └─ identical → STALLED → a human gets it
+`} />
+
+Even self-answered decisions journal the `DecisionRequested` first — the
+audit trail shows what *would* have been asked. No push notification goes
+out; the machine handles what didn't need you, silently.
+
+## Tier 3: behavioral doubt is not healable
+
+Judge failures never enter the heal ladder. If the
+[judge](../judge/) doubts the *behavior* — the end state doesn't match the
+contract, the diff wanders outside owned paths, a claimed side effect has no
+evidence — that's not a mechanical fix, and pretending otherwise is how
+fleets ship garbage confidently. Judge failures first escalate the model
+tier (fast → standard → frontier) with concrete `mustFix` feedback; when the
+ladder is exhausted, a human decides.
+
+## Configuration
+
+```toml
+auto_heal = true    # tier two on/off
+max_heals = 2       # heal budget per contract
+```

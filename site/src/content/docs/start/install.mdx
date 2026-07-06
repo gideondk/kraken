@@ -1,0 +1,69 @@
+---
+title: Install
+description: Get Kraken running from a clone — it is not on npm yet, and that's on purpose.
+---
+
+Kraken is young. It runs from a checkout — there is no npm package yet — and it
+assumes you already have at least one coding-agent CLI installed (Claude Code
+and/or Codex).
+
+## Prerequisites
+
+<div class="k-prompt-list">
+- **Node 22+** — Kraken runs TypeScript directly via `--experimental-strip-types`, no build step.
+- **pnpm** — the repo is a pnpm workspace.
+- **git** — worktrees, merge trains, and conflict radar are all real git; nothing is mocked.
+- **A harness** — [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (`claude`) is the default arm; [Codex](https://github.com/openai/codex) (`codex`) is built in too. Any other coding CLI can be wired as a [subprocess arm](../../concepts/arms/).
+</div>
+
+## Clone and install
+
+```sh
+git clone https://github.com/gideondk/kraken
+cd kraken
+pnpm install
+pnpm test        # real git repos, no mocks of git
+```
+
+That's the whole install. The CLI entry point is
+`packages/cli/src/index.ts`; a convenient alias:
+
+```sh
+alias kraken='node --experimental-strip-types --disable-warning=ExperimentalWarning \
+  /path/to/kraken/packages/cli/src/index.ts'
+```
+
+Verify it answers:
+
+```sh
+kraken decisions
+# No pending decisions. Fleet is autonomous right now.
+```
+
+## The three ways to drive it
+
+| Surface | What it is | Start with |
+| --- | --- | --- |
+| **CLI** | `kraken run`, `decide`, `exec`, `status`, `radar`, `serve` … | [Your first run](../first-run/) |
+| **Model Context Protocol (MCP) server** | `kraken mcp` — any Claude Code session becomes a helm | [The Claude Code plugin](../../guides/claude-code-plugin/) |
+| **The bridge** | `kraken serve` — a mobile-first web UI over the journal | [The bridge](../bridge/) |
+
+All three surfaces read and write the **same journal**: a decision made on your
+phone appears in the Claude Code session, and vice versa.
+
+## Being honest about maturity
+
+The core loop is real and exercised live end-to-end: plan → approve → parallel
+arms with routed skills → harness-owned commits → rubric judge with execution
+gates → tier escalation on fail → speculative train → green trunk. Journal +
+resume, merge train with auto-eject, conflict radar, skill routing, findings
+bus, judge escalation, decision consumption, multi-harness arms, MCP server,
+bridge UI, and ntfy push are tested and working.
+
+Planned, not yet built: Agent Client Protocol (ACP) arms, sandbox-runtime
+integration, a richer helm (train view, cost meter), and skills-lock pack
+resolution. See
+[Philosophy](../../reference/philosophy/) for what Kraken deliberately
+**never** builds.
+
+Next: [onboard a repository](../onboard/).

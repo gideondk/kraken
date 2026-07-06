@@ -1,0 +1,82 @@
+---
+// The landing hero's fake terminal: types out a real Kraken session shape
+// (run → plan review → arms → judge → train → green trunk), loops with a
+// long pause, and falls back to a static transcript under
+// prefers-reduced-motion.
+---
+
+<div class="k-term" role="img" aria-label="A Kraken terminal session: a run is planned, approved, executed by parallel arms, judged, and merged through the train onto a green trunk.">
+  <div class="k-term-bar" aria-hidden="true">
+    <span class="k-dot"></span><span class="k-dot"></span><span class="k-dot"></span>
+    <span class="k-term-title">kraken — fleet session</span>
+  </div>
+  <pre class="k-term-body" id="k-hero-screen" aria-hidden="true"></pre>
+</div>
+
+<script>
+  type Line = { cls: string; text: string; typed?: boolean };
+
+  const LINES: Line[] = [
+    { cls: 'cmd', text: 'kraken run "add rate limiting to the public API"', typed: true },
+    { cls: 'dim', text: 'planned 2 contracts · plan-9f3a awaiting review' },
+    { cls: 'cmd', text: 'kraken decide 9f3a plan-9f3a approve "cap at 100 req/min"', typed: true },
+    { cls: 'cmd', text: 'kraken exec 9f3a', typed: true },
+    { cls: 'info', text: '→ wave: limiter-core, http-middleware — arms dispatched in worktrees' },
+    { cls: 'ok', text: '✓ judge limiter-core: PASS (0.91) — gates green, end state matches contract' },
+    { cls: 'info', text: '▸ train: 2 cars validated against predicted trunk · merged atomically' },
+    { cls: 'ok', text: '✓ run 9f3a complete — trunk green' },
+  ];
+
+  const screen = document.getElementById('k-hero-screen');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function renderStatic(): void {
+    if (!screen) return;
+    screen.innerHTML = '';
+    for (const line of LINES) {
+      const el = document.createElement('div');
+      el.className = `tl ${line.cls}`;
+      el.textContent = line.text;
+      screen.appendChild(el);
+    }
+  }
+
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  async function play(): Promise<void> {
+    if (!screen) return;
+    for (;;) {
+      screen.innerHTML = '';
+      const cursor = document.createElement('span');
+      cursor.className = 'k-cursor';
+      for (const line of LINES) {
+        if (reduced.matches) return renderStatic();
+        const el = document.createElement('div');
+        el.className = `tl ${line.cls}`;
+        screen.appendChild(el);
+        if (line.typed) {
+          el.appendChild(cursor);
+          await sleep(420);
+          for (const ch of line.text) {
+            cursor.before(document.createTextNode(ch));
+            await sleep(ch === ' ' ? 14 : 26);
+          }
+          await sleep(240);
+        } else {
+          el.textContent = line.text;
+          el.appendChild(cursor);
+          await sleep(line.cls === 'ok' ? 720 : 520);
+        }
+      }
+      // Hold the finished session on screen, then run it again.
+      await sleep(11000);
+      if (reduced.matches) return renderStatic();
+    }
+  }
+
+  if (reduced.matches) renderStatic();
+  else void play();
+  reduced.addEventListener('change', () => {
+    if (reduced.matches) renderStatic();
+  });
+</script>

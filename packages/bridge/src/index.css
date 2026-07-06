@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-abyss: #f9fafb;
+  --bg-deep: #ffffff;
+  --bg-raised: #f3f4f6;
+
+  --edge-faint: rgba(17, 24, 39, 0.07);
+  --edge: rgba(17, 24, 39, 0.11);
+  --edge-strong: rgba(17, 24, 39, 0.2);
+
+  --pulse: #059669;
+  --pulse-dim: rgba(5, 150, 105, 0.1);
+  --sonar: #2563eb;
+  --warn: #b45309;
+  --danger: #dc2626;
+
+  --tx-hi: #111827;
+  --tx-mid: #4b5563;
+  --tx-lo: #9ca3af;
+
+  --mono: "Geist Mono", "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --background: var(--bg-abyss);
+  --foreground: var(--tx-hi);
+  --card: var(--bg-deep);
+  --card-foreground: var(--tx-hi);
+  --popover: var(--bg-deep);
+  --popover-foreground: var(--tx-hi);
+  --primary: var(--pulse);
+  --primary-foreground: #ffffff;
+  --secondary: var(--bg-raised);
+  --secondary-foreground: var(--tx-hi);
+  --muted: var(--bg-raised);
+  --muted-foreground: var(--tx-mid);
+  --accent: var(--sonar);
+  --accent-foreground: #ffffff;
+  --destructive: var(--danger);
+  --destructive-foreground: #ffffff;
+  --border: var(--edge);
+  --input: var(--edge);
+  --ring: var(--pulse);
+  --radius: 0.5rem;
+
+  color-scheme: light;
+}
+
+/* Abyssal Telemetry when the OS is dark */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-abyss: #05080a;
+    --bg-deep: #0a0f12;
+    --bg-raised: #10171c;
+    --edge-faint: rgba(148, 197, 210, 0.07);
+    --edge: rgba(148, 197, 210, 0.13);
+    --edge-strong: rgba(148, 197, 210, 0.22);
+    --pulse: #3ce8b0;
+    --pulse-dim: rgba(60, 232, 176, 0.14);
+    --sonar: #4ecde6;
+    --warn: #f2b955;
+    --danger: #f26d6d;
+    --tx-hi: #e8f0f2;
+    --tx-mid: #94a7ad;
+    --tx-lo: #566369;
+    --foreground: var(--tx-hi);
+    --card-foreground: var(--tx-hi);
+    --popover-foreground: var(--tx-hi);
+    --primary-foreground: #05080a;
+    --secondary-foreground: var(--tx-hi);
+    --muted-foreground: #7d98a1;
+    --accent-foreground: #05080a;
+    --destructive-foreground: #05080a;
+    color-scheme: dark;
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "name": "@kraken/bus",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@kraken/core": "workspace:*", "@kraken/skills": "workspace:*" }
+}

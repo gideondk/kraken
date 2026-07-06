@@ -1,0 +1,124 @@
+---
+title: 'The bridge: a visual tour'
+description: Every surface of the web helm — live runs, plan review, decision gates, judge verdicts, channels, campaigns, and the triage inbox.
+---
+
+import Shot from '../../../components/Shot.astro';
+import runLive from '../../../assets/bridge/run-live.png';
+import runLiveDark from '../../../assets/bridge/run-live-dark.png';
+import planBrief from '../../../assets/bridge/plan-review-brief.png';
+import planTasks from '../../../assets/bridge/plan-review-tasks.png';
+import runDecision from '../../../assets/bridge/run-decision.png';
+import runSuccess from '../../../assets/bridge/run-success.png';
+import channelProposal from '../../../assets/bridge/channel-proposal.png';
+import channelDark from '../../../assets/bridge/channel-dark.png';
+import campaign from '../../../assets/bridge/campaign.png';
+import decisionsInbox from '../../../assets/bridge/decisions-inbox.png';
+import mobileRun from '../../../assets/bridge/mobile-run.png';
+import mobileDrawer from '../../../assets/bridge/mobile-drawer.png';
+
+Everything below is one command — `kraken serve` — rendering one journal.
+No bridge-only state exists: each screen is a projection of the same
+append-only events written by the CLI and by agent sessions connected over
+the [Model Context Protocol (MCP)](../../guides/claude-code-plugin/).
+
+## A run, live
+
+<Shot
+  src={runLive}
+  alt="A live run on the bridge: the plan brief as three columns (objectives, constraints, done-when), with per-arm fleet state and live activity below"
+  caption="A live run. Top: the planner's <em>brief</em> — objectives, constraints, done-when — the normalized reading of your goal. Below: the fleet, one row per arm, with harness, model tier, elapsed time, and the arm's live activity streaming in."
+/>
+
+## Plan review
+
+<Shot
+  src={planBrief}
+  alt="A run paused at plan review: run title, iconed brief columns with checkable done-when items, and the fleet dependency graph"
+  caption="A plan waiting for approval. The brief renders as iconed columns, and the contracts as a dependency graph — you see the waves before anything runs."
+/>
+
+<Shot
+  src={planTasks}
+  alt="The task accordion at plan review: a wave divider, one task expanded with shape-of-done prose, owned-path pills, keyRisks in amber, an annotate button, and a sticky approve bar"
+  caption="Each contract expands: the shape-of-done, owned-path pills, and <code>keyRisks</code> in warn-amber. Annotations attach per task and travel into the contract. The sticky bar is the actual gate: approve &amp; launch, request replan, or decline."
+/>
+
+## A decision gate
+
+<Shot
+  src={runDecision}
+  alt="A pending retry-with-tools decision: the question, the judge's rationale as context, and suggested tool grants as chips"
+  caption="A <code>retry-with-tools</code> decision. The context is the judge's rationale; the suggested grants render as chips (<code>Bash(gh pr comment:*)</code> — narrow by construction). One tap re-dispatches the arm with exactly those tools."
+/>
+
+## A finished run
+
+<Shot
+  src={runSuccess}
+  alt="A completed run: judge scores per task with rationales, structured worker reports, and per-arm cost"
+  caption="Done means evidenced: per-task judge scores with their rationales, each arm's structured report (decisions, gotchas, interface changes), and what it cost."
+/>
+
+## The project channel
+
+<Shot
+  src={channelProposal}
+  alt="A project channel conversation ending in a proposal card with a plan-it action"
+  caption="The channel is where intent forms before it becomes a run. The agent reads the repo and the whole project journal, answers questions — and when the conversation converges on actionable work, emits a <em>proposal card</em>. 'Plan it' hands the goal to the run planner. The channel never edits code."
+/>
+
+## A campaign
+
+<Shot
+  src={campaign}
+  alt="A cross-repo campaign rendered as a dependency graph of single-repo runs with statuses"
+  caption="A cross-repo <a href='../../guides/campaigns/'>campaign</a>: one intent, rendered as a dependency graph of single-repo runs. Upstream interface changes compose into downstream goals; approving a pending plan auto-advances the chain."
+/>
+
+## The triage inbox
+
+<Shot
+  src={decisionsInbox}
+  alt="The decisions triage inbox: pending decisions across runs and projects, grouped for draining"
+  caption="The inbox: every pending decision across every run and project, in one drainable list. Decision queue first, fleet state below — this is the surface Kraken optimizes for."
+/>
+
+## In your pocket
+
+<div class="k-shot-pair">
+  <Shot
+    variant="phone"
+    src={mobileRun}
+    alt="The live run on a phone: mobile top bar and vertically stacked brief"
+    caption="The same live run at 390px — mobile-first, not mobile-tolerated."
+  />
+  <Shot
+    variant="phone"
+    src={mobileDrawer}
+    alt="The slide-in session drawer on a phone over a dimmed backdrop"
+    caption="The session drawer: projects, channels, and runs one swipe away."
+  />
+</div>
+
+## Dark mode ships too
+
+Light is the default face; a proper dark theme is one toggle away — same
+journal, same layout, a deep-sea console for late-shift supervision:
+
+<Shot
+  src={runLiveDark}
+  alt="The live-run layout in the bridge's dark theme"
+  caption="The live run in dark mode. The theme is chrome; the journal is the content."
+/>
+
+<Shot
+  src={channelDark}
+  alt="The project channel with a proposal card, in dark mode"
+  caption="The channel in dark mode, proposal card included."
+/>
+
+Pair it with `notify_url` push and the loop closes: a decision lands on your
+lock screen, you tap into the bridge, decide with a note, and the fleet
+resumes — [everything that didn't need you already happened without
+you](../../reference/philosophy/).
