@@ -5,7 +5,7 @@ description: Speculative validation against the predicted trunk, per-car gates, 
 
 import Fig from '../../../components/Fig.astro';
 
-Roughly 28% of agentic PRs hit merge conflicts — and *semantic* conflicts
+Roughly 28% of agentic PRs hit merge conflicts, and *semantic* conflicts
 break green builds even when the textual merge succeeds. Two branches can
 each pass tests alone and still break each other: one renames a function the
 other starts calling. The merge train exists so that failure mode dies in a
@@ -14,8 +14,8 @@ worktree instead of on your trunk.
 ## Speculative validation
 
 Completed branches queue as **cars**. Each car is validated not against
-trunk as it is, but against the **predicted trunk** — trunk plus every car
-ahead of it in the queue:
+trunk as it is, but against the **predicted trunk**, meaning trunk plus
+every car ahead of it in the queue:
 
 <Fig caption="each car gates against trunk + all cars ahead of it" text={`
  trunk ──●
@@ -29,7 +29,7 @@ ahead of it in the queue:
 `} />
 
 Every combination runs your `gates` commands in a scratch worktree. Nothing
-touches trunk until an entire train state is fully gated — then trunk
+touches trunk until an entire train state is fully gated; then trunk
 advances **atomically** to that state. A single failing car is **ejected
 alone**; the cars behind it are revalidated without it rather than being
 thrown away.
@@ -38,7 +38,7 @@ thrown away.
 
 Before any fleet work merges, the reconcile loop probes trunk itself against
 the gates in a scratch worktree. If trunk is already red, no car could ever
-take the blame honestly — so all merges hold, and one decision lands:
+take the blame honestly, so all merges hold, and one decision lands:
 
 > Trunk itself fails the merge gates (before any fleet work). Fix trunk, then
 > exec again — completed work is held, not blamed.
@@ -59,7 +59,7 @@ An ejected car keeps its branch and its work. The ejection becomes either an
 | `retry-rebased` | Start the contract over on a fresh worktree cut from current trunk. |
 | `park` | Settle the contract as not-landing; the run can complete `partial`. |
 
-Eject reasons are distilled to the error lines that matter — never the temp
+Eject reasons are distilled to the error lines that matter, never the temp
 path the gate ran in.
 
 ## One train per repo
@@ -77,7 +77,7 @@ kraken radar
 ```
 
 A read-only `git merge-tree` simulation across all live `kraken/*` branches
-surfaces files two arms are both touching — while it's still one
-conversation instead of a merge failure an hour later. It's also exposed to
+surfaces files two arms are both touching while it's still one
+conversation, instead of a merge failure an hour later. It's also exposed to
 connected agent sessions as the `conflict_radar` tool of the
 [Model Context Protocol server](../../guides/claude-code-plugin/).

@@ -7,11 +7,11 @@ import Fig from '../../../components/Fig.astro';
 
 Kraken has no run database, no state machine table, no "current status"
 column. It has a **journal**: an append-only sequence of events in SQLite.
-Every fact — a plan proposed, an arm dispatched, a gate result, a verdict, a
-human decision, a merge — is one event. Nothing mutates; supersession is a
+Every fact is one event: a plan proposed, an arm dispatched, a gate result,
+a verdict, a human decision, a merge. Nothing mutates; supersession is a
 new event.
 
-<Fig caption="one journal, three read models — all projections of the same events" text={`
+<Fig caption="one journal, three read models, all projections of the same events" text={`
   RunStarted           ┌────────────────────────┐
   PlanProposed         │                        │──▶ resume state (replay)
   ContractDispatched   │  append-only journal   │──▶ audit trail
@@ -26,8 +26,8 @@ new event.
 ## Crash-resume for free
 
 `kraken exec` is a **reconcile loop**, not a script. It projects the run
-from the journal — which contracts are planned, dispatched, completed,
-merged, parked — and does only what's still dispatchable. Kill it at any
+from the journal (which contracts are planned, dispatched, completed,
+merged, parked) and does only what's still dispatchable. Kill it at any
 point and run it again: completed work is not redone, merged cars are not
 re-queued, and open questions are still open. Resume isn't a feature; it's
 the absence of any state that could be lost.
@@ -42,23 +42,23 @@ Stale decisions lie. Before asking a human anything, the reconcile loop
 re-validates the open queue against reality:
 
 <div class="k-prompt-list">
-- A **trunk-red** decision resolves itself the moment trunk passes the gates again — journaled as `DecisionMade` with `decidedBy: "kraken"` and the annotation *"trunk passes the gates now"*.
-- A contract-scoped decision resolves itself once that contract has merged — the question no longer exists.
+- A **trunk-red** decision resolves itself the moment trunk passes the gates again, journaled as `DecisionMade` with `decidedBy: "kraken"` and the annotation *"trunk passes the gates now"*.
+- A contract-scoped decision resolves itself once that contract has merged; the question no longer exists.
 </div>
 
 You only ever see questions that are still true.
 
 ## Who decided what
 
-Every `DecisionMade` carries `decidedBy` — a human on the bridge, a
+Every `DecisionMade` carries `decidedBy`: a human on the bridge, a
 connected agent session over the Model Context Protocol (`mcp-client`), or
 `kraken` itself for auto-resolutions and auto-heals. Auto-heal even journals the `DecisionRequested` it *would* have
 asked before answering itself, so the audit trail shows the full
 counterfactual: what was asked, who answered, and why.
 
 That makes the journal the answer to the question every unattended fleet
-eventually faces: *why is this commit on trunk?* Walk the events backwards —
-merge ← gates ← verdict ← contract ← approved plan ← goal — and every hop is
+eventually faces: *why is this commit on trunk?* Walk the events backwards
+(merge ← gates ← verdict ← contract ← approved plan ← goal) and every hop is
 evidence, with an author.
 
 ## The event vocabulary

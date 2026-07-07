@@ -1,6 +1,6 @@
 ---
 title: Configuration
-description: The full kraken.toml reference — trunk, gates, tool grants, auto-heal, skills routing, arms, and push.
+description: 'The full kraken.toml reference: trunk, gates, tool grants, auto-heal, skills routing, arms, and push.'
 ---
 
 One file per repo: `kraken.toml` in the repository root. Everything below is
@@ -41,20 +41,20 @@ default_arm = "claude"
 | Key | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `trunk` | string | — | The integration branch the [merge train](../../concepts/merge-train/) advances. Often a dedicated `kraken-trunk` cut from the default branch. |
-| `gates` | string[] | `[]` | Commands every merge-train car (and the trunk probe) must pass. [Fast, honest tripwires](../../start/onboard/#the-gates-philosophy-fast-honest-tripwires) — budget 2–3 minutes total. Non-interactive, deterministic. |
+| `gates` | string[] | `[]` | Commands every merge-train car (and the trunk probe) must pass. [Fast, honest tripwires](../../start/onboard/#the-gates-philosophy-fast-honest-tripwires); budget 2–3 minutes total. Non-interactive, deterministic. |
 | `allowed_tools` | string[] | `[]` | Tool patterns auto-approved for every arm (and [inherited by the judge](../../concepts/judge/#the-judge-has-hands)). Claude Code `--allowedTools` syntax. Default-deny for everything else. |
 | `skill_roots` | string[] | `[".claude/skills", "skills"]` | Directories scanned for skill packs (subdirectories containing a `SKILL.md`). |
 | `max_parallel` | int | `4` | Concurrent arms per wave. |
 | `auto_heal` | bool | `true` | Tier two of the [heal ladder](../../concepts/auto-heal/): mechanical ejections self-heal as fix-forward. |
 | `max_heals` | int | `2` | Heal budget per contract. Journal-derived, so crash-safe. |
-| `notify_url` | string | — | POSTed on every `DecisionRequested` — an [ntfy.sh](https://ntfy.sh) topic URL or any webhook. |
+| `notify_url` | string | — | POSTed on every `DecisionRequested`: an [ntfy.sh](https://ntfy.sh) topic URL or any webhook. |
 | `default_arm` | string | `"claude"` | Which harness runs the fleet: `claude`, `codex`, or the name of an `[[arms]]` block. |
 
 ## `[[rules]]` — skill routing
 
 Deterministic task→skill routing. Explicit skill requests in a contract
 always win; rules fill the remaining slots, capped at **4 skills per
-worker** — context rot is measured, and firehosing all skills degrades
+worker**. Context rot is measured, and firehosing all skills degrades
 recall. Matched skills are injected **full-content** into the arm's prompt.
 
 ```toml
@@ -98,7 +98,7 @@ frontier_args = ["--model", "gpt-5.5"]
 ```
 
 Codex caveat: it has no per-dispatch tool allow-list flag, so
-`allowed_tools` does not reach codex arms — use `~/.codex/rules` for policy
+`allowed_tools` does not reach codex arms; use `~/.codex/rules` for policy
 there.
 
 For any other CLI, the same shape applies: `name`, `command`, and per-tier
@@ -106,7 +106,7 @@ args, run as a subprocess in the contract's worktree.
 
 ## A note on honesty
 
-`kraken.toml` is the only deliverable of onboarding — but a *wrong* config
+`kraken.toml` is the only deliverable of onboarding, but a *wrong* config
 poisons every run. If no single command covers the repo, pick the cheapest
 existing repo-wide checks and note the coverage gap in a comment. If there's
 no detectable build system, `gates = []` with a warning beats a guess.

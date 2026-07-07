@@ -1,6 +1,6 @@
 ---
 title: The bridge
-description: kraken serve — a mobile-first web UI over the journal, with lock-screen push for decision gates.
+description: kraken serve, a mobile-first web UI over the journal, with lock-screen push for decision gates.
 ---
 
 import Shot from '../../../components/Shot.astro';
@@ -14,7 +14,7 @@ The bridge is Kraken's web helm:
 kraken serve
 ```
 
-It hosts a mobile-first UI **over the journal** — the same append-only events
+It hosts a mobile-first UI **over the journal**: the same append-only events
 the CLI and the [Model Context Protocol (MCP) server](../../guides/claude-code-plugin/)
 write. There is no separate bridge state: a decision made on the bridge
 appears in your Claude Code session, and a run started from the CLI shows up
@@ -23,7 +23,7 @@ live on your phone. Updates stream over server-sent events (SSE).
 <Shot
   src={runLive}
   alt="The bridge showing a live run: the plan brief as columns, per-arm fleet state below with live activity"
-  caption="A run, live: the plan brief up top (objectives / constraints / done-when), the fleet below — per-arm status, tier, elapsed, and live activity."
+  caption="A run, live: the plan brief up top (objectives / constraints / done-when), the fleet below with per-arm status, tier, elapsed, and live activity."
 />
 
 ## What it's for
@@ -34,7 +34,7 @@ the decisions the machine couldn't settle. Runs are grouped by project in the
 sidebar; each project also gets a channel where intent forms before it
 becomes a run.
 
-Take the [visual tour](../../bridge/tour/) for a walk through every surface —
+Take the [visual tour](../../bridge/tour/) for a walk through every surface:
 live runs, decision gates with tool grants, judge verdicts, campaigns, and
 the triage inbox.
 
@@ -48,7 +48,7 @@ glance-and-decide activity, not a desk job:
     variant="phone"
     src={mobileRun}
     alt="A live run on a 390px phone viewport: mobile top bar, the brief stacked vertically, fleet state below"
-    caption="The live run at phone width — brief stacked, fleet below, everything one thumb away."
+    caption="The live run at phone width: brief stacked, fleet below, everything one thumb away."
   />
   <Shot
     variant="phone"
@@ -66,14 +66,14 @@ lock-screen push **without any infrastructure**, set an
 notify_url = "https://ntfy.sh/<your-topic>"
 ```
 
-Every `DecisionRequested` — plan approvals, ejections, judge failures — POSTs
+Every `DecisionRequested` (plan approvals, ejections, judge failures) POSTs
 to that URL and lands on your lock screen. Any webhook works; ntfy is just
 the zero-setup option.
 
 ## The discipline
 
 The bridge renders and routes; it never executes. Fleet work happens in
-arms and merges through the train — the bridge is where a human reads,
+arms and merges through the train. The bridge is where a human reads,
 questions, and decides. That split is deliberate: the moment the helm can
 edit files it becomes a slower Claude Code, and Kraken loses its reason to
 exist.

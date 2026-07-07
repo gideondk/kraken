@@ -1,6 +1,6 @@
 ---
 title: Campaigns
-description: One intent, a dependency-ordered chain of single-repo runs — upstream interface changes compose into downstream goals.
+description: One intent, a dependency-ordered chain of single-repo runs. Upstream interface changes compose into downstream goals.
 ---
 
 import Fig from '../../../components/Fig.astro';
@@ -9,7 +9,7 @@ import campaign from '../../../assets/bridge/campaign.png';
 
 Real changes rarely respect repository boundaries: the API changes, then the
 SDK, then the two apps that consume it. A **campaign** realizes one intent
-as a chain of single-repo runs — without ever weakening the single-repo
+as a chain of single-repo runs, without ever weakening the single-repo
 invariants that make runs safe.
 
 ```sh
@@ -21,15 +21,15 @@ kraken campaign-adv <campaignId>     # advance the chain
 ## Planning: slices over a dependency graph
 
 A plan-mode arm **reads** the given repositories (changing nothing) and
-splits the intent into per-repo **slices** — at most one per repository,
+splits the intent into per-repo **slices**, at most one per repository,
 ordered by dependency, forming a directed acyclic graph (DAG): dependencies
 first, no cycles. Repos that need no work are omitted.
 Each slice's goal is written self-contained, for that repo's own planner. A
 structurally invalid plan (unknown repo, duplicate slice, dependency cycle)
-throws and journals the campaign `aborted` — a bad plan leaves a corpse, not
+throws and journals the campaign `aborted`. A bad plan leaves a corpse, not
 a zombie.
 
-<Fig caption="a campaign is runs all the way down — every slice keeps every single-repo invariant" text={`
+<Fig caption="a campaign is runs all the way down: every slice keeps every single-repo invariant" text={`
  intent ─▶ campaign planner (read-only across repos)
               │
               ▼
@@ -49,9 +49,9 @@ a zombie.
 
 Arms never touch sibling repos. Context crosses repositories through exactly
 one mechanism: when a downstream slice plans, the journal-carried payload of
-each dependency's finished run is **composed into its goal** — the run
-title and outcome, per-task one-liners, and every `interfaceChange` and
-`decision` from the workers' structured reports.
+each dependency's finished run is **composed into its goal**. That payload
+carries the run title and outcome, per-task one-liners, and every
+`interfaceChange` and `decision` from the workers' structured reports.
 
 <Fig caption="what a downstream planner actually receives" text={`
  <the sdk slice's own goal>
@@ -73,7 +73,7 @@ on actually landed before building against it.*
 
 ## Approval auto-advances
 
-Each slice's plan still pauses for human review — campaigns don't buy
+Each slice's plan still pauses for human review; campaigns don't buy
 autonomy by dropping gates. But approving a pending plan on the bridge
 **auto-advances the campaign**: the approved run executes, and the next
 slices plan as their dependencies succeed. From the CLI, the same loop is
@@ -85,7 +85,7 @@ kraken decide <runId> plan-<runId> approve && kraken campaign-adv <campaignId>
 
 `campaign-adv` is re-entrant, like everything journal-backed: it plans what
 became plannable, reconciles approved runs, reports what's awaiting review
-or blocked, and completes the campaign when every slice settles — `success`
+or blocked, and completes the campaign when every slice settles: `success`
 when all slices succeed, `partial` when upstream failures mean some slices
 can never plan.
 
@@ -100,5 +100,5 @@ can never plan.
 A campaign that can't produce a valid plan aborts itself at planning time.
 A running campaign winds down through the same decision machinery as
 everything else: park the slices you no longer want, and the campaign closes
-`partial` — with the journal showing exactly which slices landed and which
+`partial`, with the journal showing exactly which slices landed and which
 were declined.

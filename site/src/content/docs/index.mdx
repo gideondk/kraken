@@ -22,7 +22,7 @@ import campaign from '../../assets/bridge/campaign.png';
     <KrakenMark size={84} />
     <h1>Kraken</h1>
     <p class="k-sub">one head, many arms — the fleet layer for coding agents</p>
-    <p class="k-tagline">Every agent tool ships code faster. <strong>Kraken is the merge authority that decides whether it lands</strong> — with real gates, a judge that can use tools, and a replayable journal.</p>
+    <p class="k-tagline">Every agent tool ships code faster. <strong>Kraken is the merge authority that decides whether it lands</strong>, with real gates, a judge that can use tools, and a replayable journal.</p>
     <div class="k-hero-actions">
       <a class="k-btn primary" href="start/install/">get started ❯</a>
       <a class="k-btn ghost" href="reference/philosophy/">why kraken</a>
@@ -34,12 +34,12 @@ import campaign from '../../assets/bridge/campaign.png';
 <div class="k-section">
   <p class="k-eyebrow">the missing pieces</p>
   <h2>What every fleet is missing</h2>
-  <p class="k-lead">Orchestrating parallel agents is easy. Landing their work on a trunk that stays green — unattended — is the hard part. Kraken is built around exactly that.</p>
+  <p class="k-lead">Orchestrating parallel agents is easy. The hard part is landing their work, unattended, on a trunk that stays green. Kraken is built around exactly that.</p>
   <div class="k-cards">
     <article class="k-card">
       <span class="k-card-glyph">[■■■□]──▶ trunk</span>
       <h3>The gated merge train</h3>
-      <p>Every change is validated against the <em>predicted</em> trunk — all cars ahead of it — behind your own build and test commands. A failing car is ejected alone; trunk only advances atomically to a fully-gated state. Semantic conflicts die on the train, not on main.</p>
+      <p>Every change is validated against the <em>predicted</em> trunk (all cars ahead of it) behind your own build and test commands. A failing car is ejected alone; trunk only advances atomically to a fully-gated state. Semantic conflicts die on the train, not on main.</p>
     </article>
     <article class="k-card">
       <span class="k-card-glyph">judge: PASS (0.91)</span>
@@ -49,7 +49,7 @@ import campaign from '../../assets/bridge/campaign.png';
     <article class="k-card">
       <span class="k-card-glyph">seq 0412 · append-only</span>
       <h3>An event-sourced journal</h3>
-      <p>Every contract, checkpoint, verdict, decision, and merge is an append-only event in SQLite. Crash and resume for free, replay any run, and keep an audit trail from goal to merge — who decided what, and why — as a side effect.</p>
+      <p>Every contract, checkpoint, verdict, decision, and merge is an append-only event in SQLite. Crash and resume for free, replay any run, and get an audit trail from goal to merge as a side effect: who decided what, and why.</p>
     </article>
   </div>
 </div>
@@ -87,7 +87,7 @@ kraken exec <run>                    # arms fan out, the train merges
 <div class="k-section">
   <p class="k-eyebrow">the bridge</p>
   <h2>Steer it from anywhere</h2>
-  <p class="k-lead"><code>kraken serve</code> hosts a mobile-first web UI over the journal — live runs, judge verdicts, and a drainable decision queue. Put it on your tailnet; decision gates reach your lock screen via ntfy.</p>
+  <p class="k-lead"><code>kraken serve</code> hosts a mobile-first web UI over the journal: live runs, judge verdicts, and a drainable decision queue. Put it on your tailnet; decision gates reach your lock screen via ntfy.</p>
   <div class="k-strip">
     <a href="bridge/tour/">
       <Image src={runLive} alt="A live Kraken run on the bridge: brief columns and fleet state" widths={[480, 960]} sizes="(max-width: 54rem) 100vw, 24rem" loading="lazy" />

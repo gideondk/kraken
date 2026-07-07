@@ -19,15 +19,15 @@ Constraint: no schema changes. Done when sync drops rows absent upstream and
 pnpm test is green."
 ```
 
-The goal is everything the planner sees — it never sees your conversation.
+The goal is everything the planner sees; it never sees your conversation.
 State the **intent, hard constraints, and what done looks like**. Vague
 delegation is the #1 multi-agent failure mode.
 
 A frontier-tier planner reads the repo and returns a plan: a run **brief**
 (objectives / constraints / done-when) and 1–8 [task
 contracts](../../concepts/contracts/) with owned paths, model tiers, and
-dependencies. If the work is tightly coupled — shared files, one subsystem,
-roughly under 5 files — it plans exactly **one** contract: a single agent
+dependencies. If the work is tightly coupled (shared files, one subsystem,
+roughly under 5 files), it plans exactly **one** contract: a single agent
 with full context beats a fragmented fleet on coupled work.
 
 ## 2 · Review the plan
@@ -36,7 +36,7 @@ with full context beats a fragmented fleet on coupled work.
 kraken decisions
 ```
 
-<Fig caption="every run pauses here — the plan is a decision like any other" text={`
+<Fig caption="every run pauses here: the plan is a decision like any other" text={`
 [plan-9f3a] Approve plan for "Implement the delete-awareness
             spec…"? 2 contracts.
   options: approve | reject
@@ -47,13 +47,13 @@ Look at the contracts, not just the summary: do the `ownsPaths` globs
 actually partition the work? Overlapping paths **will** collide on the
 train.
 
-The same review is friendlier on [the bridge](../bridge/) — the brief renders
-as columns, the fleet as a dependency graph:
+The same review is friendlier on [the bridge](../bridge/), where the brief
+renders as columns and the fleet as a dependency graph:
 
 <Shot
   src={planBrief}
   alt="A run at plan review on the bridge: the title, brief columns for objectives, constraints and done-when, and the fleet dependency graph below"
-  caption="Plan review on the bridge: the planner's brief as iconed columns — objectives, constraints, done-when — with the fleet's dependency graph below it."
+  caption="Plan review on the bridge: the planner's brief as iconed columns (objectives, constraints, done-when) with the fleet's dependency graph below it."
 />
 
 ## 3 · Approve — with a steering note if you want
@@ -62,7 +62,7 @@ as columns, the fleet as a dependency graph:
 kraken decide 9f3a plan-9f3a approve "reuse the existing retry helper in src/net"
 ```
 
-Annotations aren't comments — they travel into the contracts and reach the
+Annotations aren't comments; they travel into the contracts and reach the
 workers. Rejecting with notes sends the planner back around.
 
 ## 4 · Execute and watch
@@ -75,10 +75,10 @@ kraken exec 9f3a
 drives the run toward done. In order:
 
 <div class="k-prompt-list">
-- **Trunk probe** — runs your gates against trunk itself first. If trunk is already red, all merges hold and you get one decision: fix trunk; completed fleet work is held, never blamed.
-- **Dependency waves** — contracts whose dependencies are settled dispatch together, up to `max_parallel`, each arm in its own git worktree with its 2–4 routed skills injected.
-- **Judge per checkpoint** — gates first, then one rubric call scoring the end state 0–1. Fail escalates the model tier (fast → standard → frontier) with the judge's `mustFix` list as feedback.
-- **Merge wave** — completed branches queue as cars on the [speculative train](../../concepts/merge-train/); each is validated against the predicted trunk before anything advances. Waves merge before dependents dispatch, so downstream arms branch from real merged code.
+- **Trunk probe**: runs your gates against trunk itself first. If trunk is already red, all merges hold and you get one decision: fix trunk; completed fleet work is held, never blamed.
+- **Dependency waves**: contracts whose dependencies are settled dispatch together, up to `max_parallel`, each arm in its own git worktree with its 2–4 routed skills injected.
+- **Judge per checkpoint**: gates first, then one rubric call scoring the end state 0–1. Fail escalates the model tier (fast → standard → frontier) with the judge's `mustFix` list as feedback.
+- **Merge wave**: completed branches queue as cars on the [speculative train](../../concepts/merge-train/); each is validated against the predicted trunk before anything advances. Waves merge before dependents dispatch, so downstream arms branch from real merged code.
 </div>
 
 ## 5 · Drain decisions, reconcile again
@@ -92,7 +92,7 @@ kraken decide 9f3a eject-http-middleware fix-forward "the flaky test is known �
 kraken exec 9f3a          # reconcile again; it picks up where the journal says
 ```
 
-`exec` is idempotent. Crash it, reboot, run it again — the journal is the
+`exec` is idempotent. Crash it, reboot, run it again: the journal is the
 state, so nothing is lost and nothing repeats. When no decisions are open and
 every contract is merged or parked, the run completes:
 

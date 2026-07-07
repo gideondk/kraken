@@ -1,11 +1,11 @@
 ---
 title: The Claude Code plugin
-description: Turn any Claude Code session into a helm — fleet tools over the Model Context Protocol, plus skills for onboarding and delegation judgment.
+description: Turn any Claude Code session into a helm, with fleet tools over the Model Context Protocol plus skills for onboarding and delegation judgment.
 ---
 
 Kraken ships as a Claude Code plugin: the checkout itself is the plugin
 (`.claude-plugin/plugin.json` + `.mcp.json` + `skills/`). Load it and your
-session becomes a helm — it can plan runs, approve them, execute the fleet,
+session becomes a helm: it can plan runs, approve them, execute the fleet,
 and drain decisions, all against the same journal as the CLI and the bridge.
 The session talks to Kraken over the Model Context Protocol (MCP), the
 standard for connecting agents to tools.
@@ -30,14 +30,14 @@ claude mcp add kraken -- node --experimental-strip-types \
 | Tool | What it does |
 | --- | --- |
 | `start_run` | Plan a new run: decomposes a goal into task contracts. Returns the `runId`; the plan waits for approval via `decide()`. |
-| `list_decisions` | List pending decisions across all runs — the queue a human (or a supervising session) drains. |
+| `list_decisions` | List pending decisions across all runs, the queue a human (or a supervising session) drains. |
 | `decide` | Resolve a pending decision: plan approval, ejection handling, failure triage. Takes an optional annotation, which becomes part of the audit trail (and a [steering note](../../concepts/decisions/#steering-notes) on retries). |
 | `execute_run` | Execute an approved run: dispatch arms in parallel worktrees, merge via the speculative train. Long-running. |
 | `run_status` | Current state of a run: contracts, statuses, judge scores, costs, reports, pending decisions. |
-| `conflict_radar` | Pre-write conflict radar: `git merge-tree` simulation across live `kraken/*` branches — collisions before they're merge failures. |
+| `conflict_radar` | Pre-write conflict radar: `git merge-tree` simulation across live `kraken/*` branches, so collisions show up before they're merge failures. |
 | `register_project` | Register the repo on the bridge (sidebar group + channel) without needing a first run. Call after onboarding. |
 
-The human can watch and decide from the bridge simultaneously — the journal
+The human can watch and decide from the bridge at the same time. The journal
 is shared, so decisions made there appear in the session and vice versa.
 
 ## The skills
@@ -46,7 +46,7 @@ is shared, so decisions made there appear in the session and vice versa.
 
 Invoked when you ask Claude Code to put a repo on Kraken. It detects the
 stack, derives gate commands from the project's own scripts, **smoke-tests
-each one once** (~2 minutes — the reconcile loop re-probes trunk before every
+each one once** (~2 minutes; the reconcile loop re-probes trunk before every
 execution anyway), writes an honest `kraken.toml`, and registers the project
 on the bridge. Its hard rules: never invent gates, never overwrite an
 existing config without showing a diff, and if no build system is
@@ -60,7 +60,7 @@ all**. Delegate when the work splits into 2+ tasks with disjoint file
 ownership and a verifiable end state; do it inline when it's a single-file
 edit, exploratory, or needs conversation context the planner can't get.
 
-It also encodes the craft of composing a goal — the thing that determines
+It also encodes the craft of composing a goal, the thing that determines
 run quality:
 
 > `start_run`'s goal must be self-contained: intent, hard constraints, what
@@ -71,5 +71,5 @@ run quality:
 Then it drives the loop: review the plan via `run_status`, approve with
 annotations, `execute_run`, drain `list_decisions` when the fleet escalates
 (preferring `fix-forward` with a steering note over parking), and report
-outcomes honestly from `run_status` — per-task status, judge scores, costs,
+outcomes honestly from `run_status`: per-task status, judge scores, costs,
 and anything parked.

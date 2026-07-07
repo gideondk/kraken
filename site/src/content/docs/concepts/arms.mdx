@@ -1,11 +1,11 @@
 ---
 title: Arms
-description: Harness-agnostic workers — Claude Code and Codex natively, any coding CLI as a subprocess, each in its own worktree.
+description: Harness-agnostic workers. Claude Code and Codex natively, any coding CLI as a subprocess, each in its own worktree.
 ---
 
 import Fig from '../../../components/Fig.astro';
 
-Arms are Kraken's workers — and Kraken deliberately **is not** an agent
+Arms are Kraken's workers, and Kraken deliberately **is not** an agent
 harness. It doesn't run models, manage context windows, or implement tool
 use. It dispatches work to the coding-agent CLIs you already use, and treats
 them as interchangeable muscle.
@@ -26,7 +26,7 @@ them as interchangeable muscle.
 | Arm | Invocation | Notes |
 | --- | --- | --- |
 | `claude` | `claude -p` (headless) | The default. Native stream parsing, live activity, tier→model maps, `--allowedTools` grants. |
-| `codex` | `codex exec --json --sandbox workspace-write` | Built in. Tier map defaults to the current lineup (fast/standard/frontier); an `[[arms]]` block named `codex` overrides only the tier models. No per-dispatch tool allow-list flag — use `~/.codex/rules` for policy. |
+| `codex` | `codex exec --json --sandbox workspace-write` | Built in. Tier map defaults to the current lineup (fast/standard/frontier); an `[[arms]]` block named `codex` overrides only the tier models. No per-dispatch tool allow-list flag; use `~/.codex/rules` for policy. |
 | anything | your command | Any coding CLI wired as a plain subprocess via `[[arms]]` in `kraken.toml`, with per-tier args. |
 
 The **model tier** (`fast` / `standard` / `frontier`) is the contract's
@@ -44,13 +44,13 @@ context flows through exactly one channel: the
 ## Harness-owned commits
 
 The arm commits its own work. Kraken doesn't reach into a worktree and
-`git add` whatever it finds — the harness decides what belongs in the
+`git add` whatever it finds. The harness decides what belongs in the
 change, and Kraken verifies from the outside (and treats "reported success
 but produced no changes" as a decision-worthy anomaly, not a silent pass).
 
 ## Receipts, not claims
 
-Each arm ends by filing a structured report — summary, files touched,
+Each arm ends by filing a structured report: summary, files touched,
 decisions, gotchas, interface changes, blockers, confidence. That report is
 the arm's **receipt**: the judge reads it as the worker's claim (ranked
 below gate evidence), the bus routes its findings to siblings, and campaigns
@@ -62,7 +62,7 @@ tolerated as a fallback, never preferred.
 Arms run non-interactive under a **default-deny** tool policy. Repo-level
 `allowed_tools` in `kraken.toml` (Claude Code `--allowedTools` syntax) plus
 any per-contract `retry-with-tools` grants are everything an arm may touch
-beyond file edits. Anything else is silently denied at the harness level —
+beyond file edits. Anything else is silently denied at the harness level:
 the worker hits the wall, reports it as a blocker in its receipt, and the
 [permission-skip](../judge/#the-permission-skip) turns that into a scoped
 grant decision instead of a louder model.

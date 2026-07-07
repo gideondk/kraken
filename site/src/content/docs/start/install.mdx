@@ -1,19 +1,19 @@
 ---
 title: Install
-description: Get Kraken running from a clone — it is not on npm yet, and that's on purpose.
+description: Get Kraken running from a clone. It is not on npm yet, and that's on purpose.
 ---
 
-Kraken is young. It runs from a checkout — there is no npm package yet — and it
+Kraken is young. It runs from a checkout (there is no npm package yet) and it
 assumes you already have at least one coding-agent CLI installed (Claude Code
 and/or Codex).
 
 ## Prerequisites
 
 <div class="k-prompt-list">
-- **Node 22+** — Kraken runs TypeScript directly via `--experimental-strip-types`, no build step.
-- **pnpm** — the repo is a pnpm workspace.
-- **git** — worktrees, merge trains, and conflict radar are all real git; nothing is mocked.
-- **A harness** — [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (`claude`) is the default arm; [Codex](https://github.com/openai/codex) (`codex`) is built in too. Any other coding CLI can be wired as a [subprocess arm](../../concepts/arms/).
+- **Node 22+**: Kraken runs TypeScript directly via `--experimental-strip-types`, no build step.
+- **pnpm**: the repo is a pnpm workspace.
+- **git**: worktrees, merge trains, and conflict radar are all real git; nothing is mocked.
+- **A harness**: [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (`claude`) is the default arm; [Codex](https://github.com/openai/codex) (`codex`) is built in too. Any other coding CLI can be wired as a [subprocess arm](../../concepts/arms/).
 </div>
 
 ## Clone and install
@@ -45,8 +45,8 @@ kraken decisions
 | Surface | What it is | Start with |
 | --- | --- | --- |
 | **CLI** | `kraken run`, `decide`, `exec`, `status`, `radar`, `serve` … | [Your first run](../first-run/) |
-| **Model Context Protocol (MCP) server** | `kraken mcp` — any Claude Code session becomes a helm | [The Claude Code plugin](../../guides/claude-code-plugin/) |
-| **The bridge** | `kraken serve` — a mobile-first web UI over the journal | [The bridge](../bridge/) |
+| **Model Context Protocol (MCP) server** | `kraken mcp`; any Claude Code session becomes a helm | [The Claude Code plugin](../../guides/claude-code-plugin/) |
+| **The bridge** | `kraken serve`, a mobile-first web UI over the journal | [The bridge](../bridge/) |
 
 All three surfaces read and write the **same journal**: a decision made on your
 phone appears in the Claude Code session, and vice versa.

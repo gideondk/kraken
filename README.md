@@ -14,17 +14,17 @@
 
 **One head, many arms — the fleet layer for coding agents.**
 
-**Docs: [gideondk.github.io/kraken](https://gideondk.github.io/kraken/)** · start there — it types out a fleet session for you.
+**Docs: [gideondk.github.io/kraken](https://gideondk.github.io/kraken/)** · start there; it types out a fleet session for you.
 
 ---
 
 Something changed this year. Agents write good code faster than you can read
-it. Ask for a feature and four branches appear before your coffee cools —
-each one confident, each one plausible, and no honest way to know which of
-them deserves your trunk.
+it. Ask for a feature and four branches appear before your coffee cools.
+Each one is confident, each one is plausible, and you have no honest way to
+know which of them deserves your trunk.
 
 The bottleneck moved. It isn't *writing* code anymore. It's **landing** it:
-deciding, with evidence, that a change belongs in the codebase — while three
+deciding, with evidence, that a change belongs in the codebase while three
 other agents are landing theirs on the same trunk at the same time.
 
 Every agent tool ships code faster. **Kraken is the merge authority that
@@ -47,10 +47,10 @@ decides whether it lands.**
 
 You state the outcome and approve a plan. Arms work in parallel, in isolated
 worktrees, under contracts that say what they own and what done means. A judge
-scores the end state — with your gates as evidence that outranks anything the
-agent claims. A merge train lands the survivors one atomic, fully-gated step
-at a time. And everything — every verdict, every decision, every merge, yours
-or the machine's — is an append-only event you can replay and audit.
+scores the end state, treating your gates as evidence that outranks anything
+the agent claims. A merge train lands the survivors one atomic, fully-gated
+step at a time. And everything is an append-only event you can replay and
+audit: every verdict, every decision, every merge, yours or the machine's.
 
 You steer. The machine does everything that didn't need you.
 
@@ -60,10 +60,10 @@ Three things you won't find elsewhere, each born from watching real fleets
 fail:
 
 - **A judge with hands.** Agents are confident; that's the problem. Kraken's
-  judge runs your gates first, scores the end state against the contract, and
-  — when the worker had tool access — inherits those same tools to verify
-  external claims itself. "I posted the review replies" gets checked, not
-  believed.
+  judge runs your gates first and scores the end state against the contract.
+  When the worker had tool access, the judge inherits those same tools to
+  verify external claims itself. "I posted the review replies" gets checked,
+  not believed.
 - **A merge train, not a pile of pull requests.** ~28% of agentic changes
   conflict; semantic conflicts break green builds even when the textual merge
   succeeds. Every change is validated against the *predicted* trunk in a
@@ -71,8 +71,8 @@ fail:
   as a group, and mechanical failures heal themselves before anyone asks you.
 - **A journal that never lies.** Every contract, checkpoint, verdict, decision
   and merge is an append-only event (SQLite). Crash and resume for free.
-  Decisions auto-invalidate when reality changes. Who decided what — you, the
-  judge, or the machine — is a recorded fact, forever.
+  Decisions auto-invalidate when reality changes. Who decided what (you, the
+  judge, or the machine) is a recorded fact, forever.
 
 And when one repository isn't enough: **campaigns** chain single-repo runs
 across a dependency graph, carrying each run's interface changes into the
@@ -94,7 +94,7 @@ kraken decide <run> plan-<run> approve
 kraken exec <run>                     # arms fan out, the train lands them
 ```
 
-Gates are arbitrary commands — a test suite, a typecheck, or any adversarial
+Gates are arbitrary commands: a test suite, a typecheck, or any adversarial
 reviewer that speaks exit codes. Findings become the eject reason and flow
 straight into a repair contract.
 
@@ -107,8 +107,8 @@ plugin, so any session becomes a bridge:
 claude mcp add kraken -- node --experimental-strip-types <kraken>/packages/cli/src/index.ts mcp --repo $(pwd)
 ```
 
-Then `start_run`, `decide`, `execute_run`, `run_status`, `conflict_radar` —
-or install the plugin and let the `kraken-init` skill onboard a repository
+Then `start_run`, `decide`, `execute_run`, `run_status`, `conflict_radar`.
+Or install the plugin and let the `kraken-init` skill onboard a repository
 for you.
 
 ## The bridge, on your phone
@@ -116,7 +116,7 @@ for you.
 `kraken serve` hosts a mobile-first web app over the journal: review plans
 (select any text to annotate it), watch arms think in real time, drain the
 decision queue, steer campaigns. Put it on your tailnet, pin it to your home
-screen, and set `notify_url = "https://ntfy.sh/<topic>"` — every decision
+screen, and set `notify_url = "https://ntfy.sh/<topic>"`. Every decision
 that needs you lands on your lock screen.
 
 **[The visual tour](https://gideondk.github.io/kraken/bridge/tour/)** shows
@@ -127,7 +127,7 @@ all of it with real screenshots.
 The core loop is real and exercised end-to-end: plan → review → parallel arms
 with routed skills → judged checkpoints → speculative train → green trunk,
 plus auto-heal, campaigns, scoped permission grants, and both Claude Code and
-Codex arms. 45 tests run against real git repositories — nothing mocks git.
+Codex arms. 45 tests run against real git repositories; nothing mocks git.
 What it is not: an agent harness, a CI system, or a code editor. The judge is only
 as good as your gates, and the docs say so plainly.
 
@@ -139,5 +139,5 @@ pnpm test        # 45 tests, real git repos, no mocks of git
 ```
 
 Built with an event-sourced core so every claim above is checkable: read the
-journal, replay the run, see who decided what. That's the whole philosophy —
+journal, replay the run, see who decided what. That's the whole philosophy:
 **verification over trust**, applied to itself.

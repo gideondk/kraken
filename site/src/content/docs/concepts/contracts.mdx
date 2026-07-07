@@ -1,14 +1,14 @@
 ---
 title: Task contracts
-description: Typed decomposition — what each arm owns, what done looks like, and when not to fan out at all.
+description: "Typed decomposition: what each arm owns, what done looks like, and when not to fan out at all."
 ---
 
 import Fig from '../../../components/Fig.astro';
 import Shot from '../../../components/Shot.astro';
 import planTasks from '../../../assets/bridge/plan-review-tasks.png';
 
-Kraken never hands an agent a vibe. The planner — a frontier-tier arm reading
-your actual repo — decomposes a goal into **task contracts**: typed,
+Kraken never hands an agent a vibe. The planner (a frontier-tier arm reading
+your actual repo) decomposes a goal into **task contracts**: typed,
 validated units of work with explicit boundaries and a verifiable end state.
 
 <Fig caption="the anatomy of a contract" text={`
@@ -31,9 +31,9 @@ validated units of work with explicit boundaries and a verifiable end state.
 }
 `} />
 
-Alongside the contracts, the planner returns a run **brief** — objectives,
-constraints, done-when — the normalized reading of your goal that renders on
-the bridge instead of prompt prose. Contracts are validated before the plan
+Alongside the contracts, the planner returns a run **brief** covering
+objectives, constraints, and done-when: the normalized reading of your goal,
+rendered on the bridge instead of prompt prose. Contracts are validated before the plan
 reaches you; problems surface as warnings on the plan-approval decision.
 
 This is what a contract looks like at plan review on the bridge:
@@ -41,15 +41,15 @@ This is what a contract looks like at plan review on the bridge:
 <Shot
   src={planTasks}
   alt="The plan review task accordion on the bridge: a wave divider, task #1 expanded showing the shape of done, owned-path pills, amber keyRisks, an annotate action, and a sticky approval bar"
-  caption="A contract under review: the shape-of-done prose, owned-path pills, <code>keyRisks</code> in amber, per-task annotation — and the sticky bar where you approve &amp; launch, request a replan, or decline."
+  caption="A contract under review: the shape-of-done prose, owned-path pills, <code>keyRisks</code> in amber, per-task annotation, and the sticky bar where you approve &amp; launch, request a replan, or decline."
 />
 
 ## Fleet vs. one agent: single-context detection
 
 The most important planning rule is about when **not** to use the fleet.
 The planner fans out only when tasks own genuinely disjoint paths and can be
-verified independently. If the work is tightly coupled — shared files, deep
-sequential dependencies, one subsystem, roughly under 5 files touched — it
+verified independently. If the work is tightly coupled (shared files, deep
+sequential dependencies, one subsystem, roughly under 5 files touched), it
 plans exactly **one** contract:
 
 > A single agent with full context outperforms a fragmented fleet on coupled
@@ -64,18 +64,18 @@ doing its job.
 `ownsPaths` and `mustNotTouch` are not documentation:
 
 <div class="k-prompt-list">
-- The [judge](../judge/) fails any checkpoint whose diff writes outside the owned paths — automatically, regardless of score.
+- The [judge](../judge/) fails any checkpoint whose diff writes outside the owned paths, automatically, regardless of score.
 - The [findings bus](../findings-bus/) routes discoveries to siblings by owned-path overlap.
 - The pre-write conflict radar (`kraken radar`) simulates merges across live worktrees, so overlapping edits surface while they're still one conversation.
 </div>
 
-Tasks whose owned paths overlap *will* collide at merge — the planner is
+Tasks whose owned paths overlap *will* collide at merge. The planner is
 told so, plans around it, and you should reject plans where the partition
 looks wrong.
 
 ## keyRisks: the planner names the sharp edges
 
-For genuinely risky work — migrations, concurrency, breaking surface — the
+For genuinely risky work (migrations, concurrency, breaking surface) the
 planner attaches `keyRisks`: what could go wrong, one item each. They render
 on the plan review so a human approves with eyes open, and they're omitted
 when nothing is genuinely risky, so they stay meaningful.
@@ -83,7 +83,7 @@ when nothing is genuinely risky, so they stay meaningful.
 ## The other half: the worker report
 
 A contract is a two-sided document. When an arm finishes, it files a
-structured **report** — the receipt for its work:
+structured **report**, the receipt for its work:
 
 ```json
 {
