@@ -128,8 +128,7 @@ The core loop is real and exercised end-to-end: plan → review → parallel arm
 with routed skills → judged checkpoints → speculative train → green trunk,
 plus auto-heal, campaigns, scoped permission grants, and both Claude Code and
 Codex arms. 45 tests run against real git repositories — nothing mocks git.
-What it is not: an agent harness, a CI system, or a code editor. The
-[roadmap](docs/ROADMAP.md) is research-ranked and public; the judge is only
+What it is not: an agent harness, a CI system, or a code editor. The judge is only
 as good as your gates, and the docs say so plainly.
 
 ## Development
